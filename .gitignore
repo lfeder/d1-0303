@@ -1,0 +1,13 @@
+# Data files (too large for git)
+data/*.parquet
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Empty leftover
+app/
