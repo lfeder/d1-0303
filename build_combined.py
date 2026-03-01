@@ -311,6 +311,16 @@ function renderChart() {
     const color = EXCHANGE_COLORS[exch] || '#888';
     const rows = coinChartData[exch].filter(r => r[0] >= fromDate && r[0] <= toDate);
 
+    // Detect settlement interval
+    const allSettTimes = [];
+    for (const [t, r, ev] of rows) { if (ev === 1) allSettTimes.push(t); }
+    let interval = '';
+    if (allSettTimes.length >= 2) {
+      const gap = (allSettTimes[1] - allSettTimes[0]) / 3600000;
+      interval = ` (${gap}h)`;
+    }
+    const label = exch + interval;
+
     const settTs = [], settRate = [];
     for (const [t, r, ev] of rows) {
       if (ev === 1) {
@@ -341,23 +351,23 @@ function renderChart() {
       for (const [t, r, ev] of rows) { implTs.push(new Date(t)); implRate.push(r); }
       traces.push({
         x: implTs, y: implRate, type: 'scattergl', mode: 'lines',
-        name: exch, line: { color, width: 1 },
+        name: label, line: { color, width: 1 },
         legendgroup: exch, xaxis: 'x', yaxis: 'y',
-        hovertemplate: '%{y:.1f}<extra>' + exch + '</extra>',
+        hovertemplate: '%{y:.1f}<extra>' + label + '</extra>',
       });
       traces.push({
         x: settTs, y: settRate, type: 'scattergl', mode: 'markers',
-        name: exch + ' settle', marker: { color, size: 5, symbol: 'diamond' },
+        name: label + ' settle', marker: { color, size: 5, symbol: 'diamond' },
         legendgroup: exch, showlegend: false, xaxis: 'x', yaxis: 'y',
-        hovertemplate: '%{y:.1f}<extra>' + exch + ' settle</extra>',
+        hovertemplate: '%{y:.1f}<extra>' + label + ' settle</extra>',
       });
     } else {
       // Settlement only (8h) — connected line + markers
       traces.push({
         x: settTs, y: settRate, type: 'scattergl', mode: 'lines+markers',
-        name: exch, line: { color, width: 1.5 }, marker: { color, size: 4 },
+        name: label, line: { color, width: 1.5 }, marker: { color, size: 4 },
         xaxis: 'x', yaxis: 'y',
-        hovertemplate: '%{y:.1f}<extra>' + exch + '</extra>',
+        hovertemplate: '%{y:.1f}<extra>' + label + '</extra>',
       });
     }
   }
