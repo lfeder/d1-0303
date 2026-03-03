@@ -14,8 +14,18 @@
   .legend-item { display: flex; align-items: center; gap: 4px; }
   .legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
 
+  /* ── Shared column widths (summary + detail aligned) ── */
+  .col-name-w { width: 100px; min-width: 100px; }
+  .col-cov-w { width: 70px; min-width: 70px; }
+
   /* ── Exchange summary rows (compact) ───────────────── */
   #exch-summary { margin-bottom: 0; }
+  .exch-header {
+    display: flex; align-items: center; padding: 3px 0;
+    border-bottom: 2px solid #bbb; background: #e0e0d8;
+    font-size: 10px; font-weight: bold; color: #444;
+  }
+  .exch-header div { padding: 0 8px; }
   .exch-row {
     display: flex; align-items: center; padding: 3px 0; cursor: pointer;
     border-bottom: 1px solid #d8d8d0;
@@ -23,25 +33,12 @@
   .exch-row:hover { background: #eeeee8; }
   .exch-row.even { background: #fafaf5; }
   .exch-row.even:hover { background: #eeeee8; }
-  .exch-row.selected { background: #dde4ec; font-weight: bold; }
-  .exch-header {
-    display: flex; align-items: center; padding: 3px 0;
-    border-bottom: 2px solid #bbb; background: #e0e0d8;
-    font-size: 10px; font-weight: bold; color: #444;
-  }
-  .exch-header div { padding: 0 6px; }
-  .exch-col-name { width: 100px; min-width: 100px; }
-  .exch-col-coins { width: 50px; min-width: 50px; text-align: right; }
-  .exch-col-gaps { width: 50px; min-width: 50px; text-align: right; }
-  .exch-col-cov { width: 60px; min-width: 60px; text-align: right; }
+  .exch-row.selected { background: #dde4ec; }
   .exch-label {
-    display: flex; align-items: center; gap: 0; font-size: 11px;
-    width: 260px; min-width: 260px; padding: 0 6px;
+    display: flex; align-items: center; gap: 0; font-size: 11px; padding: 0 8px;
   }
-  .exch-label .ename { width: 100px; min-width: 100px; font-size: 11px; }
-  .exch-label .ecoins { width: 50px; min-width: 50px; text-align: right; font-size: 10px; color: #666; }
-  .exch-label .egaps { width: 50px; min-width: 50px; text-align: right; font-size: 10px; color: #666; }
-  .exch-label .ecov { width: 60px; min-width: 60px; text-align: right; font-size: 10px; }
+  .exch-label .ename { font-size: 11px; }
+  .exch-label .ecov { text-align: right; padding-right: 12px; font-size: 10px; }
   .exch-bar-wrap {
     flex: 1; height: 14px; position: relative; background: #d4e6d4;
     border-radius: 2px; overflow: hidden;
@@ -72,8 +69,7 @@
   }
   .col-header .col:hover { color: #000; }
   .col-header .col.active { color: #3a6ea8; }
-  .col-header .col-name { width: 100px; min-width: 100px; }
-  .col-header .col-cov { width: 60px; min-width: 60px; justify-content: flex-end; }
+  .col-header .col-cov { justify-content: flex-end; padding-right: 12px; }
   .col-header .col-timeline { flex: 1; position: relative; cursor: default; padding: 0; }
   .date-tick {
     position: absolute; bottom: 2px; font-size: 9px; color: #888;
@@ -89,18 +85,17 @@
   .coin-row.even { background: #fafaf5; }
   .coin-row.even:hover { background: #eeeee8; }
   .coin-label {
-    width: 160px; min-width: 160px; padding: 0 8px;
-    display: flex; align-items: center; gap: 0; font-size: 11px;
+    display: flex; align-items: center; gap: 0; font-size: 11px; padding: 0 8px;
   }
-  .coin-label .name { font-weight: bold; width: 100px; min-width: 100px; }
-  .coin-label .cov { width: 60px; min-width: 60px; text-align: right; padding-right: 8px; font-size: 10px; }
+  .coin-label .name { font-weight: bold; }
+  .coin-label .cov { text-align: right; padding-right: 12px; font-size: 10px; }
   .bar-wrap { flex: 1; height: 14px; position: relative; background: #d4e6d4; border-radius: 2px; overflow: hidden; }
   .gap-mark { position: absolute; top: 0; height: 100%; background: #c0392b; min-width: 1px; }
   .listing-mark { position: absolute; top: 0; height: 100%; background: #bbb; min-width: 1px; }
 
   .gap-detail-panel {
     display: none; background: #f9f9f4; border: 1px solid #ddd; border-radius: 4px;
-    margin: 3px 0 6px 160px; padding: 8px 12px; font-size: 10px;
+    margin: 3px 0 6px 170px; padding: 8px 12px; font-size: 10px;
   }
   .gap-detail-panel.open { display: block; }
   .gap-detail-panel table { border-collapse: collapse; width: 100%; }
@@ -134,6 +129,11 @@
 let GAP_DATA = null;
 const exchSort = {};
 let selectedExch = null;
+
+const ABBREV = {
+  Aster: 'AS', Binance: 'BN', Bybit: 'BY',
+  Hyperliquid: 'HL', Lighter: 'LT', OKX: 'OK'
+};
 
 async function loadData() {
   if (typeof INLINE_DATA !== 'undefined') {
@@ -242,7 +242,6 @@ function renderExchBar(barWrap, mergedGaps, mergedEdges) {
 
 function selectExch(exch) {
   if (selectedExch === exch) {
-    // Deselect
     selectedExch = null;
     document.getElementById('coin-detail').classList.remove('open');
     document.querySelectorAll('.exch-row.selected').forEach(r => r.classList.remove('selected'));
@@ -253,7 +252,9 @@ function selectExch(exch) {
   document.querySelector(`.exch-row[data-exch="${exch}"]`).classList.add('selected');
   const panel = document.getElementById('coin-detail');
   panel.classList.add('open');
-  document.getElementById('coin-detail-header').textContent = exch;
+  const abbr = ABBREV[exch] || exch;
+  const nCoins = Object.keys(GAP_DATA.gaps[exch]).length;
+  document.getElementById('coin-detail-header').textContent = `${exch} (${abbr}) \u2014 ${nCoins} coins`;
   renderCoinDetail(document.getElementById('coin-detail-inner'), exch);
 }
 
@@ -270,25 +271,22 @@ function render() {
   // Exchange header row
   const hdr = document.createElement('div');
   hdr.className = 'exch-header';
-  hdr.innerHTML = '<div class="exch-col-name">Exchange</div>'
-    + '<div class="exch-col-coins">Coins</div>'
-    + '<div class="exch-col-gaps">Gaps</div>'
-    + '<div class="exch-col-cov">Cov %</div>'
-    + '<div style="flex:1;padding:0 6px">Timeline</div>';
+  hdr.innerHTML = '<div class="col-name-w">Exchange</div>'
+    + '<div class="col-cov-w" style="text-align:right;padding-right:12px">Cov %</div>'
+    + '<div style="flex:1">Timeline</div>';
   container.appendChild(hdr);
 
   exchOrder.forEach((exch, ei) => {
     const summary = getExchSummary(exch);
+    const abbr = ABBREV[exch] || exch;
     const row = document.createElement('div');
     row.className = 'exch-row' + (ei % 2 === 0 ? ' even' : '');
     row.dataset.exch = exch;
 
     const label = document.createElement('div');
     label.className = 'exch-label';
-    label.innerHTML = `<span class="ename">${exch}</span>`
-      + `<span class="ecoins">${summary.totalCoins}</span>`
-      + `<span class="egaps">${summary.withGaps}</span>`
-      + `<span class="ecov" style="color:${covColor(summary.avgCov)}">${summary.avgCov.toFixed(1)}%</span>`;
+    label.innerHTML = `<span class="ename col-name-w">${abbr} (${summary.totalCoins})</span>`
+      + `<span class="ecov col-cov-w" style="color:${covColor(summary.avgCov)}">${summary.avgCov.toFixed(1)}%</span>`;
 
     const barWrap = document.createElement('div');
     barWrap.className = 'exch-bar-wrap';
@@ -322,11 +320,11 @@ function renderCoinDetail(container, exch) {
   const hdr = document.createElement('div');
   hdr.className = 'col-header';
   const colName = document.createElement('div');
-  colName.className = 'col col-name' + (st.col==='name' ? ' active' : '');
+  colName.className = 'col col-name-w' + (st.col==='name' ? ' active' : '');
   colName.dataset.col = 'name';
   colName.textContent = 'Coin' + arrowStr('name');
   const colCov = document.createElement('div');
-  colCov.className = 'col col-cov' + (st.col==='coverage' ? ' active' : '');
+  colCov.className = 'col col-cov-w col-cov' + (st.col==='coverage' ? ' active' : '');
   colCov.dataset.col = 'coverage';
   colCov.textContent = 'Cov %' + arrowStr('coverage');
   const colTimeline = document.createElement('div');
@@ -357,7 +355,7 @@ function renderCoinDetail(container, exch) {
 
     const label = document.createElement('div');
     label.className = 'coin-label';
-    label.innerHTML = `<span class="name">${coin}</span><span class="cov" style="color:${covColor(info.coverage_pct)}">${info.coverage_pct}%</span>`;
+    label.innerHTML = `<span class="name col-name-w">${coin}</span><span class="cov col-cov-w" style="color:${covColor(info.coverage_pct)}">${info.coverage_pct.toFixed(1)}%</span>`;
 
     const barWrap = document.createElement('div');
     barWrap.className = 'bar-wrap';
