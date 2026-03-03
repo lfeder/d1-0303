@@ -10,27 +10,28 @@
   h2 { font-size: 14px; margin-bottom: 4px; }
   p.sub { color: #666; font-size: 10px; margin-bottom: 12px; }
 
-  .legend { display: flex; gap: 16px; margin-bottom: 14px; font-size: 10px; color: #666; }
+  .legend { display: flex; gap: 16px; margin-bottom: 10px; font-size: 10px; color: #666; }
   .legend-item { display: flex; align-items: center; gap: 4px; }
   .legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
 
-  /* ── Exchange summary rows ─────────────────────────── */
+  /* ── Exchange summary rows (compact) ───────────────── */
+  #exch-summary { margin-bottom: 0; }
   .exch-row {
-    display: flex; align-items: center; padding: 8px 0; cursor: pointer;
-    border-bottom: 1px solid #d0d0c8;
+    display: flex; align-items: center; padding: 3px 0; cursor: pointer;
+    border-bottom: 1px solid #d8d8d0;
   }
   .exch-row:hover { background: #eeeee8; }
   .exch-row.even { background: #fafaf5; }
   .exch-row.even:hover { background: #eeeee8; }
-  .exch-row.expanded { background: #e4e8ec; border-bottom: none; }
+  .exch-row.selected { background: #dde4ec; font-weight: bold; }
   .exch-label {
-    width: 260px; min-width: 260px; padding: 0 8px;
+    width: 260px; min-width: 260px; padding: 0 6px;
     display: flex; align-items: center; gap: 0; font-size: 11px;
   }
-  .exch-label .ename { font-weight: bold; width: 100px; min-width: 100px; font-size: 12px; }
+  .exch-label .ename { width: 100px; min-width: 100px; font-size: 11px; }
   .exch-label .estat { width: 160px; min-width: 160px; font-size: 10px; color: #666; }
   .exch-bar-wrap {
-    flex: 1; height: 20px; position: relative; background: #d4e6d4;
+    flex: 1; height: 14px; position: relative; background: #d4e6d4;
     border-radius: 2px; overflow: hidden;
   }
   .exch-bar-wrap .gap-mark {
@@ -39,16 +40,19 @@
   .exch-bar-wrap .listing-mark {
     position: absolute; top: 0; height: 100%; background: #bbb; min-width: 1px;
   }
-  .exch-arrow { width: 20px; text-align: center; font-size: 12px; color: #888; }
 
-  /* ── Expanded coin detail panel ────────────────────── */
-  .exch-detail { display: none; border-bottom: 2px solid #bbb; background: #fff; }
-  .exch-detail.open { display: block; }
-  .exch-detail-inner { padding: 8px 0 8px 0; max-height: 60vh; overflow-y: auto; }
+  /* ── Coin detail area (below all exchanges) ────────── */
+  #coin-detail { display: none; border-top: 2px solid #aaa; margin-top: 4px; }
+  #coin-detail.open { display: block; }
+  #coin-detail-header {
+    padding: 6px 8px; background: #e0e0d8; font-size: 12px; font-weight: bold;
+    border-bottom: 1px solid #ccc;
+  }
+  .coin-detail-inner { max-height: calc(100vh - 260px); overflow-y: auto; }
 
   .col-header {
-    display: flex; align-items: center; padding: 4px 0;
-    border-bottom: 2px solid #bbb; background: #e0e0d8; position: sticky; top: 0; z-index: 1;
+    display: flex; align-items: center; padding: 3px 0;
+    border-bottom: 2px solid #bbb; background: #e8e8e2; position: sticky; top: 0; z-index: 1;
   }
   .col-header .col {
     padding: 2px 8px; cursor: pointer; font-weight: bold; font-size: 10px;
@@ -72,7 +76,7 @@
   }
 
   .coin-row {
-    display: flex; align-items: center; padding: 4px 0; cursor: pointer;
+    display: flex; align-items: center; padding: 3px 0; cursor: pointer;
     border-bottom: 1px solid #e0e0d8;
   }
   .coin-row:hover { background: #eeeee8; }
@@ -84,13 +88,13 @@
   }
   .coin-label .name { font-weight: bold; width: 100px; min-width: 100px; }
   .coin-label .cov { width: 60px; min-width: 60px; text-align: right; font-size: 10px; }
-  .bar-wrap { flex: 1; height: 16px; position: relative; background: #d4e6d4; border-radius: 2px; overflow: hidden; }
+  .bar-wrap { flex: 1; height: 14px; position: relative; background: #d4e6d4; border-radius: 2px; overflow: hidden; }
   .gap-mark { position: absolute; top: 0; height: 100%; background: #c0392b; min-width: 1px; }
   .listing-mark { position: absolute; top: 0; height: 100%; background: #bbb; min-width: 1px; }
 
   .gap-detail-panel {
     display: none; background: #f9f9f4; border: 1px solid #ddd; border-radius: 4px;
-    margin: 4px 0 8px 160px; padding: 8px 12px; font-size: 10px;
+    margin: 3px 0 6px 160px; padding: 8px 12px; font-size: 10px;
   }
   .gap-detail-panel.open { display: block; }
   .gap-detail-panel table { border-collapse: collapse; width: 100%; }
@@ -106,7 +110,7 @@
 <body>
 
 <h2>L2 Orderbook Gap Viewer</h2>
-<p class="sub">Coverage gaps in 1-minute L2 orderbook data &nbsp;|&nbsp; click an exchange to expand per-coin details</p>
+<p class="sub">Coverage gaps in 1-minute L2 orderbook data &nbsp;|&nbsp; click an exchange to see per-coin details below</p>
 
 <div class="legend">
   <div class="legend-item"><div class="legend-swatch" style="background:#d4e6d4"></div> Data present</div>
@@ -114,12 +118,16 @@
   <div class="legend-item"><div class="legend-swatch" style="background:#bbb"></div> Before first / after last tick</div>
 </div>
 
-<div id="main"></div>
+<div id="exch-summary"></div>
+<div id="coin-detail">
+  <div id="coin-detail-header"></div>
+  <div class="coin-detail-inner" id="coin-detail-inner"></div>
+</div>
 
 <script>
 let GAP_DATA = null;
-// Per-exchange sort state
 const exchSort = {};
+let selectedExch = null;
 
 async function loadData() {
   if (typeof INLINE_DATA !== 'undefined') {
@@ -152,7 +160,6 @@ function covColor(pct) {
   return pct >= 99 ? '#4a4' : pct >= 95 ? '#a80' : '#c03';
 }
 
-// Compute exchange summary: merge all coin gap intervals into a reduced set
 function mergeIntervals(intervals) {
   if (!intervals.length) return [];
   intervals.sort((a, b) => a[0] - b[0]);
@@ -174,29 +181,19 @@ function getExchSummary(exch) {
   const totalCoins = coins.length;
   const withGaps = coins.filter(c => exchData[c].missing_minutes > 0).length;
   const avgCov = coins.reduce((s, c) => s + exchData[c].coverage_pct, 0) / totalCoins;
-
-  // Collect all gap intervals + listing edges for aggregate bar
   const allIntervals = [];
   const listingEdges = [];
   const globalStart = new Date(GAP_DATA.data_start).getTime();
   const globalEnd = new Date(GAP_DATA.data_end).getTime();
-
   coins.forEach(coin => {
     const info = exchData[coin];
     const firstMs = new Date(info.first_tick).getTime();
     const lastMs = new Date(info.last_tick).getTime();
-    // Gaps
     info.gaps.forEach(g => allIntervals.push([g[0], g[1]]));
-    // Listing edges as separate category
     if (firstMs > globalStart) listingEdges.push([globalStart, firstMs]);
     if (lastMs < globalEnd) listingEdges.push([lastMs, globalEnd]);
   });
-
-  return {
-    totalCoins, withGaps, avgCov,
-    mergedGaps: mergeIntervals(allIntervals),
-    mergedEdges: mergeIntervals(listingEdges),
-  };
+  return { totalCoins, withGaps, avgCov, mergedGaps: mergeIntervals(allIntervals), mergedEdges: mergeIntervals(listingEdges) };
 }
 
 function buildDateAxis() {
@@ -204,7 +201,6 @@ function buildDateAxis() {
   const globalEnd = new Date(GAP_DATA.data_end).getTime();
   const globalSpan = globalEnd - globalStart;
   const DAY_MS = 86400000;
-
   const dateAxis = document.createElement('div');
   dateAxis.className = 'date-axis';
   dateAxis.innerHTML = '<div class="date-axis-spacer"></div>';
@@ -228,7 +224,6 @@ function renderExchBar(barWrap, mergedGaps, mergedEdges) {
   const globalStart = new Date(GAP_DATA.data_start).getTime();
   const globalEnd = new Date(GAP_DATA.data_end).getTime();
   const globalSpan = globalEnd - globalStart;
-
   mergedEdges.forEach(([s, e]) => {
     const mark = document.createElement('div');
     mark.className = 'listing-mark';
@@ -245,15 +240,27 @@ function renderExchBar(barWrap, mergedGaps, mergedEdges) {
   });
 }
 
+function selectExch(exch) {
+  if (selectedExch === exch) {
+    // Deselect
+    selectedExch = null;
+    document.getElementById('coin-detail').classList.remove('open');
+    document.querySelectorAll('.exch-row.selected').forEach(r => r.classList.remove('selected'));
+    return;
+  }
+  selectedExch = exch;
+  document.querySelectorAll('.exch-row.selected').forEach(r => r.classList.remove('selected'));
+  document.querySelector(`.exch-row[data-exch="${exch}"]`).classList.add('selected');
+  const panel = document.getElementById('coin-detail');
+  panel.classList.add('open');
+  document.getElementById('coin-detail-header').textContent = exch;
+  renderCoinDetail(document.getElementById('coin-detail-inner'), exch);
+}
+
 function render() {
-  const main = document.getElementById('main');
-  main.innerHTML = '';
+  const container = document.getElementById('exch-summary');
+  container.innerHTML = '';
 
-  const globalStart = new Date(GAP_DATA.data_start).getTime();
-  const globalEnd = new Date(GAP_DATA.data_end).getTime();
-  const globalSpan = globalEnd - globalStart;
-
-  // Sort exchanges by avg coverage ascending (worst first)
   const exchOrder = GAP_DATA.exchanges.slice().sort((a, b) => {
     const avgA = Object.values(GAP_DATA.gaps[a]).reduce((s, c) => s + c.coverage_pct, 0) / Object.keys(GAP_DATA.gaps[a]).length;
     const avgB = Object.values(GAP_DATA.gaps[b]).reduce((s, c) => s + c.coverage_pct, 0) / Object.keys(GAP_DATA.gaps[b]).length;
@@ -262,66 +269,35 @@ function render() {
 
   exchOrder.forEach((exch, ei) => {
     const summary = getExchSummary(exch);
-
-    // Exchange summary row
     const row = document.createElement('div');
     row.className = 'exch-row' + (ei % 2 === 0 ? ' even' : '');
-
-    const arrow = document.createElement('div');
-    arrow.className = 'exch-arrow';
-    arrow.textContent = '\u25B6';
+    row.dataset.exch = exch;
 
     const label = document.createElement('div');
     label.className = 'exch-label';
     label.innerHTML = `<span class="ename">${exch}</span>`
       + `<span class="estat">${summary.totalCoins} coins`
-      + ` &nbsp; <span style="color:${covColor(summary.avgCov)}">${summary.avgCov.toFixed(1)}% avg</span>`
-      + ` &nbsp; ${summary.withGaps} w/ gaps</span>`;
+      + ` &nbsp;<span style="color:${covColor(summary.avgCov)}">${summary.avgCov.toFixed(1)}%</span>`
+      + ` &nbsp;${summary.withGaps} w/ gaps</span>`;
 
     const barWrap = document.createElement('div');
     barWrap.className = 'exch-bar-wrap';
     renderExchBar(barWrap, summary.mergedGaps, summary.mergedEdges);
 
-    row.appendChild(arrow);
     row.appendChild(label);
     row.appendChild(barWrap);
-
-    // Detail panel (lazy-built)
-    const detail = document.createElement('div');
-    detail.className = 'exch-detail';
-
-    row.onclick = () => {
-      const isOpen = detail.classList.contains('open');
-      // Close all
-      document.querySelectorAll('.exch-detail.open').forEach(d => d.classList.remove('open'));
-      document.querySelectorAll('.exch-row.expanded').forEach(r => {
-        r.classList.remove('expanded');
-        r.querySelector('.exch-arrow').textContent = '\u25B6';
-      });
-      if (!isOpen) {
-        detail.classList.add('open');
-        row.classList.add('expanded');
-        arrow.textContent = '\u25BC';
-        renderCoinDetail(detail, exch);
-      }
-    };
-
-    main.appendChild(row);
-    main.appendChild(detail);
+    row.onclick = () => selectExch(exch);
+    container.appendChild(row);
   });
 }
 
 function renderCoinDetail(container, exch) {
   container.innerHTML = '';
-  const inner = document.createElement('div');
-  inner.className = 'exch-detail-inner';
-
   const exchData = GAP_DATA.gaps[exch];
   const globalStart = new Date(GAP_DATA.data_start).getTime();
   const globalEnd = new Date(GAP_DATA.data_end).getTime();
   const globalSpan = globalEnd - globalStart;
 
-  // Sort state per exchange
   if (!exchSort[exch]) exchSort[exch] = { col: 'coverage', asc: true };
   const st = exchSort[exch];
 
@@ -332,7 +308,6 @@ function renderCoinDetail(container, exch) {
     return st.asc ? cmp : -cmp;
   });
 
-  // Column header
   const arrowStr = (col) => st.col === col ? (st.asc ? ' \u25B2' : ' \u25BC') : '';
   const hdr = document.createElement('div');
   hdr.className = 'col-header';
@@ -348,17 +323,13 @@ function renderCoinDetail(container, exch) {
       renderCoinDetail(container, exch);
     };
   });
-  inner.appendChild(hdr);
+  container.appendChild(hdr);
+  container.appendChild(buildDateAxis());
 
-  // Date axis
-  inner.appendChild(buildDateAxis());
-
-  // Coin rows
   coins.forEach((coin, idx) => {
     const info = exchData[coin];
     const firstMs = new Date(info.first_tick).getTime();
     const lastMs = new Date(info.last_tick).getTime();
-
     const wrapper = document.createElement('div');
 
     const row = document.createElement('div');
@@ -402,7 +373,6 @@ function renderCoinDetail(container, exch) {
     row.appendChild(barWrap);
     wrapper.appendChild(row);
 
-    // Gap detail panel per coin
     const detail = document.createElement('div');
     detail.className = 'gap-detail-panel';
     row.onclick = (e) => {
@@ -436,10 +406,8 @@ function renderCoinDetail(container, exch) {
     };
 
     wrapper.appendChild(detail);
-    inner.appendChild(wrapper);
+    container.appendChild(wrapper);
   });
-
-  container.appendChild(inner);
 }
 
 loadData();
