@@ -1,4 +1,91 @@
 {
+  "0G": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "1000000MOG": [
+    "Binance",
+    "Bybit"
+  ],
+  "1000BONK": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter"
+  ],
+  "1000CAT": [
+    "Binance",
+    "Bybit"
+  ],
+  "1000CHEEMS": [
+    "Aster",
+    "Binance"
+  ],
+  "1000FLOKI": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter"
+  ],
+  "1000LUNC": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "1000PEPE": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter"
+  ],
+  "1000RATS": [
+    "Binance",
+    "Bybit"
+  ],
+  "1000SHIB": [
+    "Aster",
+    "Binance",
+    "Lighter"
+  ],
+  "1000TOSHI": [
+    "Bybit",
+    "Lighter"
+  ],
+  "1000XEC": [
+    "Binance",
+    "Bybit"
+  ],
+  "1INCH": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "2Z": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "4": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "A": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "AAPL": [
+    "Aster",
+    "Lighter"
+  ],
   "AAVE": [
     "Aster",
     "Binance",
@@ -6,6 +93,31 @@
     "Hyperliquid",
     "Lighter",
     "OKX"
+  ],
+  "ACE": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "ACH": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ACT": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ACU": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ACX": [
+    "Binance",
+    "Bybit"
   ],
   "ADA": [
     "Aster",
@@ -15,11 +127,125 @@
     "Lighter",
     "OKX"
   ],
+  "AERGO": [
+    "Binance",
+    "Bybit"
+  ],
   "AERO": [
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "AEVO": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "AGLD": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "AI": [
+    "Binance",
+    "Hyperliquid"
+  ],
+  "AIA": [
+    "Aster",
+    "Binance"
+  ],
+  "AIN": [
+    "Binance",
+    "Bybit"
+  ],
+  "AIO": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "AIXBT": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "AKE": [
+    "Binance",
+    "Bybit"
+  ],
+  "AKT": [
+    "Binance",
+    "Bybit"
+  ],
+  "ALCH": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "ALGO": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "ALICE": [
+    "Binance",
+    "Bybit"
+  ],
+  "ALLO": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ALPINE": [
+    "Binance",
+    "Bybit"
+  ],
+  "ALT": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "AMZN": [
+    "Aster",
+    "Binance",
+    "Lighter"
+  ],
+  "ANIME": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "ANKR": [
+    "Binance",
+    "Bybit"
+  ],
+  "APE": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "APEX": [
+    "Bybit",
+    "Hyperliquid",
+    "Lighter"
+  ],
+  "API3": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "APR": [
+    "Aster",
+    "Binance",
+    "Bybit",
     "OKX"
   ],
   "APT": [
@@ -30,6 +256,13 @@
     "Lighter",
     "OKX"
   ],
+  "AR": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
   "ARB": [
     "Aster",
     "Binance",
@@ -37,6 +270,80 @@
     "Hyperliquid",
     "Lighter",
     "OKX"
+  ],
+  "ARC": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter"
+  ],
+  "ARIA": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "ARK": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "ARKM": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ARPA": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "ASR": [
+    "Binance",
+    "Bybit"
+  ],
+  "ASTER": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "ASTR": [
+    "Binance",
+    "Bybit"
+  ],
+  "AT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ATH": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ATOM": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "AUCTION": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "AVA": [
+    "Binance",
+    "Bybit"
+  ],
+  "AVAAI": [
+    "Binance",
+    "Bybit"
   ],
   "AVAX": [
     "Aster",
@@ -46,6 +353,107 @@
     "Lighter",
     "OKX"
   ],
+  "AVL": [
+    "Aster",
+    "Bybit"
+  ],
+  "AVNT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "AWE": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "AXL": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "AXS": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "AZTEC": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "B": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "B2": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "B3": [
+    "Binance",
+    "Bybit"
+  ],
+  "BABY": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "BAN": [
+    "Binance",
+    "Bybit"
+  ],
+  "BANANA": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "BANANAS31": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "BAND": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "BANK": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "BARD": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "BAS": [
+    "Aster",
+    "Binance"
+  ],
+  "BAT": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "BB": [
+    "Binance",
+    "Bybit"
+  ],
   "BCH": [
     "Aster",
     "Binance",
@@ -53,6 +461,17 @@
     "Hyperliquid",
     "Lighter",
     "OKX"
+  ],
+  "BEAT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "BEL": [
+    "Aster",
+    "Binance",
+    "Bybit"
   ],
   "BERA": [
     "Aster",
@@ -62,6 +481,55 @@
     "Lighter",
     "OKX"
   ],
+  "BICO": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "BIGTIME": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "BIO": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "BIRB": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter"
+  ],
+  "BLAST": [
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "BLESS": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "BLUAI": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "BLUR": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "BMT": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
   "BNB": [
     "Aster",
     "Binance",
@@ -69,6 +537,47 @@
     "Hyperliquid",
     "Lighter",
     "OKX"
+  ],
+  "BNT": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "BOB": [
+    "Aster",
+    "Binance"
+  ],
+  "BOME": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "BR": [
+    "Binance",
+    "Bybit"
+  ],
+  "BRETT": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "BREV": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "BROCCOLI714": [
+    "Aster",
+    "Binance"
+  ],
+  "BSV": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
   ],
   "BTC": [
     "Aster",
@@ -78,6 +587,145 @@
     "Lighter",
     "OKX"
   ],
+  "BTR": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "BULLA": [
+    "Aster",
+    "Binance"
+  ],
+  "C": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "C98": [
+    "Binance",
+    "Bybit"
+  ],
+  "CAKE": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "CARV": [
+    "Binance",
+    "Bybit"
+  ],
+  "CATI": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "CC": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "CELO": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "CETUS": [
+    "Binance",
+    "Bybit"
+  ],
+  "CFX": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "CGPT": [
+    "Binance",
+    "Bybit"
+  ],
+  "CHILLGUY": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "CHR": [
+    "Binance",
+    "Bybit"
+  ],
+  "CHZ": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "CKB": [
+    "Binance",
+    "Bybit"
+  ],
+  "CLANKER": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "CLO": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "COAI": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "COIN": [
+    "Binance",
+    "Lighter"
+  ],
+  "COLLECT": [
+    "Aster",
+    "Binance"
+  ],
+  "COMP": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "COOKIE": [
+    "Binance",
+    "Bybit"
+  ],
+  "CORE": [
+    "Bybit",
+    "OKX"
+  ],
+  "COTI": [
+    "Binance",
+    "Bybit"
+  ],
+  "COW": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "CRCL": [
+    "Binance",
+    "Lighter"
+  ],
+  "CRO": [
+    "Bybit",
+    "Lighter",
+    "OKX"
+  ],
+  "CROSS": [
+    "Binance",
+    "Bybit"
+  ],
   "CRV": [
     "Aster",
     "Binance",
@@ -86,12 +734,81 @@
     "Lighter",
     "OKX"
   ],
+  "CTK": [
+    "Binance",
+    "Bybit"
+  ],
+  "CTSI": [
+    "Binance",
+    "Bybit"
+  ],
+  "CVC": [
+    "Binance",
+    "Bybit"
+  ],
+  "CVX": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "CYBER": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "CYS": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "DAM": [
+    "Aster",
+    "Binance"
+  ],
+  "DASH": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "DEEP": [
+    "Binance",
+    "Bybit"
+  ],
+  "DEGEN": [
+    "Binance",
+    "Bybit"
+  ],
+  "DEXE": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "DIA": [
+    "Binance",
+    "Bybit"
+  ],
   "DOGE": [
     "Aster",
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "DOLO": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter"
+  ],
+  "DOOD": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
     "OKX"
   ],
   "DOT": [
@@ -102,12 +819,44 @@
     "Lighter",
     "OKX"
   ],
+  "DRIFT": [
+    "Binance",
+    "Bybit"
+  ],
+  "DUSK": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter"
+  ],
   "DYDX": [
     "Aster",
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "DYM": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "EDEN": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter",
+    "OKX"
+  ],
+  "EDU": [
+    "Binance",
+    "Bybit"
+  ],
+  "EGLD": [
+    "Binance",
+    "Bybit",
     "OKX"
   ],
   "EIGEN": [
@@ -118,12 +867,60 @@
     "Lighter",
     "OKX"
   ],
+  "ELSA": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
   "ENA": [
     "Aster",
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "ENJ": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ENS": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "ENSO": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "EPIC": [
+    "Binance",
+    "Bybit"
+  ],
+  "ERA": [
+    "Binance",
+    "Bybit"
+  ],
+  "ESP": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ESPORTS": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "ETC": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
     "OKX"
   ],
   "ETH": [
@@ -142,6 +939,25 @@
     "Lighter",
     "OKX"
   ],
+  "ETHW": [
+    "Binance",
+    "OKX"
+  ],
+  "EUL": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "EVAA": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "F": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
   "FARTCOIN": [
     "Aster",
     "Binance",
@@ -150,12 +966,135 @@
     "Lighter",
     "OKX"
   ],
+  "FET": [
+    "Aster",
+    "Binance",
+    "Hyperliquid"
+  ],
+  "FF": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter"
+  ],
+  "FHE": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "FIDA": [
+    "Binance",
+    "Bybit"
+  ],
+  "FIGHT": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
   "FIL": [
     "Aster",
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "FIO": [
+    "Binance",
+    "Bybit"
+  ],
+  "FLOCK": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "FLOW": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "FLUID": [
+    "Binance",
+    "Bybit"
+  ],
+  "FLUX": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "FOGO": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "FOLKS": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "FORM": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "FRAX": [
+    "Aster",
+    "Binance"
+  ],
+  "FUN": [
+    "Aster",
+    "Binance"
+  ],
+  "GALA": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "GAS": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "GIGGLE": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "GLM": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "GMT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "GMX": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "GOAT": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "GPS": [
+    "Aster",
+    "Binance",
+    "Bybit",
     "OKX"
   ],
   "GRASS": [
@@ -166,12 +1105,107 @@
     "Lighter",
     "OKX"
   ],
+  "GRIFFAIN": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "GRT": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "GUA": [
+    "Aster",
+    "Binance"
+  ],
+  "GUN": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "GWEI": [
+    "Aster",
+    "Binance"
+  ],
+  "H": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "HAEDAL": [
+    "Binance",
+    "Bybit"
+  ],
+  "HANA": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
   "HBAR": [
     "Aster",
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "HEI": [
+    "Binance",
+    "Bybit"
+  ],
+  "HEMI": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "HFT": [
+    "Binance",
+    "Bybit"
+  ],
+  "HIGH": [
+    "Binance",
+    "Bybit"
+  ],
+  "HIPPO": [
+    "Binance",
+    "Bybit"
+  ],
+  "HIVE": [
+    "Binance",
+    "Bybit"
+  ],
+  "HMSTR": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "HOLO": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "HOME": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "HOOD": [
+    "Aster",
+    "Binance",
+    "Lighter",
+    "OKX"
+  ],
+  "HOOK": [
+    "Binance",
+    "Bybit"
+  ],
+  "HUMA": [
+    "Binance",
+    "Bybit",
     "OKX"
   ],
   "HYPE": [
@@ -182,6 +1216,15 @@
     "Lighter",
     "OKX"
   ],
+  "HYPER": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "ICNT": [
+    "Binance",
+    "Bybit"
+  ],
   "ICP": [
     "Aster",
     "Binance",
@@ -190,6 +1233,75 @@
     "Lighter",
     "OKX"
   ],
+  "ICX": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ID": [
+    "Binance",
+    "Bybit"
+  ],
+  "ILV": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "IMX": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "IN": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "INIT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "INJ": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "INTC": [
+    "Aster",
+    "Binance",
+    "Lighter"
+  ],
+  "INX": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "IO": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "IOST": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "IOTA": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "IOTX": [
+    "Binance",
+    "Bybit"
+  ],
   "IP": [
     "Aster",
     "Binance",
@@ -197,6 +1309,35 @@
     "Hyperliquid",
     "Lighter",
     "OKX"
+  ],
+  "IR": [
+    "Aster",
+    "Binance"
+  ],
+  "IRYS": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "JASMY": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "JCT": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "JELLYJELLY": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "JST": [
+    "Binance",
+    "Bybit"
   ],
   "JTO": [
     "Aster",
@@ -214,6 +1355,10 @@
     "Lighter",
     "OKX"
   ],
+  "KAIA": [
+    "Binance",
+    "Bybit"
+  ],
   "KAITO": [
     "Binance",
     "Bybit",
@@ -221,7 +1366,77 @@
     "Lighter",
     "OKX"
   ],
+  "KAS": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "KAVA": [
+    "Binance",
+    "Bybit"
+  ],
+  "KERNEL": [
+    "Binance",
+    "Bybit"
+  ],
+  "KGEN": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "KITE": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "KMNO": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "KNC": [
+    "Binance",
+    "Bybit"
+  ],
+  "KSM": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "LA": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "LAB": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "LAYER": [
+    "Binance",
+    "Hyperliquid",
+    "OKX"
+  ],
   "LDO": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "LIGHT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "LINEA": [
     "Aster",
     "Binance",
     "Bybit",
@@ -237,6 +1452,39 @@
     "Lighter",
     "OKX"
   ],
+  "LISTA": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "LIT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "LPT": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "LQTY": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "LRC": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "LSK": [
+    "Binance",
+    "Bybit"
+  ],
   "LTC": [
     "Aster",
     "Binance",
@@ -245,10 +1493,165 @@
     "Lighter",
     "OKX"
   ],
+  "LUMIA": [
+    "Binance",
+    "Bybit"
+  ],
+  "LUNA2": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "LYN": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "M": [
+    "Binance",
+    "Bybit"
+  ],
+  "MAGIC": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "MAGMA": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "MANA": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "MANTA": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "MASK": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "MAV": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "MAVIA": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "MBOX": [
+    "Binance",
+    "Bybit"
+  ],
+  "ME": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "MEGA": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter"
+  ],
+  "MELANIA": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "MEME": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "MERL": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "MET": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "META": [
+    "Aster",
+    "Lighter"
+  ],
+  "METIS": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "MEW": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "MINA": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "MIRA": [
+    "Binance",
+    "Bybit"
+  ],
+  "MITO": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "MLN": [
+    "Binance",
+    "Bybit"
+  ],
+  "MMT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
   "MNT": [
     "Bybit",
     "Hyperliquid",
     "Lighter"
+  ],
+  "MOCA": [
+    "Binance",
+    "Bybit"
+  ],
+  "MON": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "MOODENG": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
   ],
   "MORPHO": [
     "Binance",
@@ -256,6 +1659,46 @@
     "Hyperliquid",
     "Lighter",
     "OKX"
+  ],
+  "MOVE": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "MOVR": [
+    "Binance",
+    "Bybit"
+  ],
+  "MSFT": [
+    "Aster",
+    "Lighter"
+  ],
+  "MSTR": [
+    "Binance",
+    "Lighter",
+    "OKX"
+  ],
+  "MTL": [
+    "Binance",
+    "Bybit"
+  ],
+  "MUBARAK": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "MYX": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter"
+  ],
+  "NAORIS": [
+    "Aster",
+    "Binance",
+    "Bybit"
   ],
   "NEAR": [
     "Aster",
@@ -265,6 +1708,90 @@
     "Lighter",
     "OKX"
   ],
+  "NEIRO": [
+    "Aster",
+    "Binance",
+    "OKX"
+  ],
+  "NEO": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "NEWT": [
+    "Binance",
+    "Bybit"
+  ],
+  "NFP": [
+    "Binance",
+    "Bybit"
+  ],
+  "NIGHT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "NIL": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "NMR": [
+    "Binance",
+    "Bybit",
+    "Lighter",
+    "OKX"
+  ],
+  "NOM": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "NOT": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "NTRN": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "NVDA": [
+    "Aster",
+    "Lighter"
+  ],
+  "NXPC": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "OG": [
+    "Binance",
+    "Bybit"
+  ],
+  "OGN": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "OKB": [
+    "Bybit",
+    "OKX"
+  ],
+  "OL": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ON": [
+    "Aster",
+    "Binance"
+  ],
   "ONDO": [
     "Aster",
     "Binance",
@@ -273,12 +1800,67 @@
     "Lighter",
     "OKX"
   ],
+  "ONE": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ONG": [
+    "Binance",
+    "Bybit"
+  ],
+  "ONT": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
   "OP": [
     "Aster",
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "OPEN": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "OPN": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ORBS": [
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "ORCA": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "ORDER": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ORDI": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "OXT": [
+    "Binance",
+    "Bybit"
+  ],
+  "PARTI": [
+    "Aster",
+    "Binance",
+    "Bybit",
     "OKX"
   ],
   "PAXG": [
@@ -303,6 +1885,50 @@
     "Lighter",
     "OKX"
   ],
+  "PEOPLE": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "PHA": [
+    "Binance",
+    "Bybit"
+  ],
+  "PIEVERSE": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "PIPPIN": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter",
+    "OKX"
+  ],
+  "PIXEL": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "PLTR": [
+    "Binance",
+    "Lighter"
+  ],
+  "PLUME": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "PNUT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
   "POL": [
     "Aster",
     "Binance",
@@ -311,12 +1937,73 @@
     "Lighter",
     "OKX"
   ],
+  "POLYX": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
   "POPCAT": [
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
     "OKX"
+  ],
+  "PORTAL": [
+    "Binance",
+    "Bybit"
+  ],
+  "POWER": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "POWR": [
+    "Binance",
+    "Bybit"
+  ],
+  "PROM": [
+    "Binance",
+    "Bybit"
+  ],
+  "PROMPT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "PROVE": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "PTB": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "PUFFER": [
+    "Binance",
+    "Bybit"
+  ],
+  "PUMP": [
+    "Aster",
+    "Binance",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "PUMPBTC": [
+    "Binance",
+    "Bybit"
+  ],
+  "PUNDIX": [
+    "Binance",
+    "Bybit"
   ],
   "PYTH": [
     "Aster",
@@ -326,12 +2013,235 @@
     "Lighter",
     "OKX"
   ],
+  "Q": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "QNT": [
+    "Binance",
+    "Bybit"
+  ],
+  "QQQ": [
+    "Aster",
+    "Lighter"
+  ],
+  "QTUM": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "RARE": [
+    "Binance",
+    "Bybit"
+  ],
+  "RAVE": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "RDNT": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "RECALL": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "RED": [
+    "Binance",
+    "Bybit"
+  ],
+  "RENDER": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "REQ": [
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "RESOLV": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "REZ": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "RIVER": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter",
+    "OKX"
+  ],
+  "RLC": [
+    "Binance",
+    "Bybit"
+  ],
+  "RLS": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "RONIN": [
+    "Binance",
+    "Bybit"
+  ],
+  "ROSE": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "RPL": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "RSR": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "RUNE": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "RVN": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "S": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "SAFE": [
+    "Binance",
+    "Bybit"
+  ],
+  "SAGA": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "SAHARA": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "SAND": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "SAPIEN": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "SCR": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "SCRT": [
+    "Binance",
+    "Bybit"
+  ],
   "SEI": [
     "Aster",
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "SENT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "SFP": [
+    "Binance",
+    "Bybit"
+  ],
+  "SHELL": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "SIGN": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "SIREN": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "SKL": [
+    "Binance",
+    "Bybit"
+  ],
+  "SKR": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter"
+  ],
+  "SKY": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "SKYAI": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "SLP": [
+    "Binance",
+    "Bybit"
+  ],
+  "SNDK": [
+    "Aster",
+    "Lighter"
+  ],
+  "SNX": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
     "OKX"
   ],
   "SOL": [
@@ -342,6 +2252,51 @@
     "Lighter",
     "OKX"
   ],
+  "SOLV": [
+    "Binance",
+    "Bybit"
+  ],
+  "SOMI": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "SONIC": [
+    "Binance",
+    "Bybit"
+  ],
+  "SOON": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "SOPH": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "SPACE": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "SPELL": [
+    "Binance",
+    "Bybit"
+  ],
+  "SPK": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "SPORTFUN": [
+    "Binance",
+    "Bybit"
+  ],
   "SPX": [
     "Aster",
     "Binance",
@@ -350,12 +2305,62 @@
     "Lighter",
     "OKX"
   ],
+  "SQD": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "SSV": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "STABLE": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "STBL": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter"
+  ],
+  "STEEM": [
+    "Binance",
+    "Bybit"
+  ],
+  "STG": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "STO": [
+    "Binance",
+    "Bybit"
+  ],
+  "STORJ": [
+    "Binance",
+    "Bybit"
+  ],
   "STRK": [
     "Aster",
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "STX": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
     "OKX"
   ],
   "SUI": [
@@ -366,12 +2371,83 @@
     "Lighter",
     "OKX"
   ],
+  "SUN": [
+    "Binance",
+    "Bybit"
+  ],
+  "SUPER": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "SUSHI": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "SWARMS": [
+    "Binance",
+    "Bybit"
+  ],
+  "SXT": [
+    "Binance",
+    "Bybit"
+  ],
+  "SYN": [
+    "Binance",
+    "Bybit"
+  ],
+  "SYRUP": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "SYS": [
+    "Binance",
+    "Bybit"
+  ],
+  "T": [
+    "Binance",
+    "Bybit"
+  ],
+  "TA": [
+    "Binance",
+    "Bybit"
+  ],
+  "TAC": [
+    "Binance",
+    "Bybit"
+  ],
+  "TAG": [
+    "Aster",
+    "Binance"
+  ],
+  "TAIKO": [
+    "Binance",
+    "Bybit"
+  ],
+  "TAKE": [
+    "Aster",
+    "Binance"
+  ],
   "TAO": [
     "Aster",
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "THE": [
+    "Binance",
+    "Bybit"
+  ],
+  "THETA": [
+    "Binance",
+    "Bybit",
     "OKX"
   ],
   "TIA": [
@@ -382,6 +2458,16 @@
     "Lighter",
     "OKX"
   ],
+  "TLM": [
+    "Binance",
+    "Bybit"
+  ],
+  "TNSR": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
   "TON": [
     "Aster",
     "Binance",
@@ -390,12 +2476,58 @@
     "Lighter",
     "OKX"
   ],
+  "TOSHI": [
+    "Aster",
+    "Binance"
+  ],
+  "TOWNS": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "TRADOOR": [
+    "Aster",
+    "Binance"
+  ],
+  "TRB": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "TREE": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "TRIA": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "TRU": [
+    "Binance",
+    "Bybit"
+  ],
   "TRUMP": [
     "Aster",
     "Binance",
     "Bybit",
     "Hyperliquid",
     "Lighter",
+    "OKX"
+  ],
+  "TRUST": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "TRUTH": [
+    "Aster",
+    "Binance",
+    "Bybit",
     "OKX"
   ],
   "TRX": [
@@ -406,6 +2538,52 @@
     "Lighter",
     "OKX"
   ],
+  "TSLA": [
+    "Aster",
+    "Binance",
+    "Lighter",
+    "OKX"
+  ],
+  "TST": [
+    "Binance",
+    "Hyperliquid"
+  ],
+  "TURBO": [
+    "Aster",
+    "Binance",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "TURTLE": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "TUT": [
+    "Binance",
+    "Bybit"
+  ],
+  "TWT": [
+    "Binance",
+    "Bybit"
+  ],
+  "UAI": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "UB": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "UMA": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
   "UNI": [
     "Aster",
     "Binance",
@@ -414,6 +2592,72 @@
     "Lighter",
     "OKX"
   ],
+  "US": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "USD1": [
+    "Aster",
+    "Bybit"
+  ],
+  "USDC": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "USELESS": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Lighter",
+    "OKX"
+  ],
+  "USTC": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "USUAL": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "VANA": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "VANRY": [
+    "Binance",
+    "Bybit"
+  ],
+  "VELO": [
+    "Aster",
+    "Bybit"
+  ],
+  "VELODROME": [
+    "Binance",
+    "Bybit"
+  ],
+  "VELVET": [
+    "Binance",
+    "Bybit"
+  ],
+  "VET": [
+    "Binance",
+    "Bybit"
+  ],
+  "VFY": [
+    "Binance",
+    "Bybit"
+  ],
+  "VINE": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
   "VIRTUAL": [
     "Aster",
     "Binance",
@@ -421,6 +2665,44 @@
     "Hyperliquid",
     "Lighter",
     "OKX"
+  ],
+  "VVV": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter"
+  ],
+  "W": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "WAL": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "WAXP": [
+    "Binance",
+    "Bybit"
+  ],
+  "WCT": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "WET": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "WHITEWHALE": [
+    "Aster",
+    "Bybit"
   ],
   "WIF": [
     "Binance",
@@ -437,6 +2719,44 @@
     "Lighter",
     "OKX"
   ],
+  "WLFI": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "WOO": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "XAG": [
+    "Aster",
+    "Binance",
+    "Lighter",
+    "OKX"
+  ],
+  "XAI": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "XAN": [
+    "Binance",
+    "Bybit"
+  ],
+  "XAU": [
+    "Aster",
+    "Binance",
+    "Lighter",
+    "OKX"
+  ],
+  "XCU": [
+    "Aster",
+    "Lighter"
+  ],
   "XLM": [
     "Aster",
     "Binance",
@@ -452,7 +2772,144 @@
     "Hyperliquid",
     "Lighter"
   ],
+  "XNY": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "XPD": [
+    "Aster",
+    "Binance",
+    "Lighter",
+    "OKX"
+  ],
+  "XPIN": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "XPL": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "XPT": [
+    "Aster",
+    "Binance",
+    "Lighter",
+    "OKX"
+  ],
   "XRP": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "XTZ": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "XVG": [
+    "Binance",
+    "Bybit"
+  ],
+  "XVS": [
+    "Binance",
+    "Bybit"
+  ],
+  "YB": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "YFI": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "YGG": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "YZY": [
+    "Bybit",
+    "Hyperliquid",
+    "Lighter"
+  ],
+  "ZAMA": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ZBT": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ZEC": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "ZEN": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "ZEREBRO": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid"
+  ],
+  "ZETA": [
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "OKX"
+  ],
+  "ZIL": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ZK": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "Hyperliquid",
+    "Lighter",
+    "OKX"
+  ],
+  "ZKC": [
+    "Aster",
+    "Binance",
+    "Bybit"
+  ],
+  "ZKP": [
+    "Aster",
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "ZORA": [
     "Aster",
     "Binance",
     "Bybit",
@@ -467,5 +2924,18 @@
     "Hyperliquid",
     "Lighter",
     "OKX"
+  ],
+  "ZRX": [
+    "Binance",
+    "Bybit",
+    "OKX"
+  ],
+  "\u5e01\u5b89\u4eba\u751f": [
+    "Aster",
+    "Binance"
+  ],
+  "\u6211\u8e0f\u9a6c\u6765\u4e86": [
+    "Aster",
+    "Binance"
   ]
 }
