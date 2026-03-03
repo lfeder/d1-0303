@@ -253,7 +253,14 @@ function render() {
   const globalEnd = new Date(GAP_DATA.data_end).getTime();
   const globalSpan = globalEnd - globalStart;
 
-  GAP_DATA.exchanges.forEach((exch, ei) => {
+  // Sort exchanges by avg coverage ascending (worst first)
+  const exchOrder = GAP_DATA.exchanges.slice().sort((a, b) => {
+    const avgA = Object.values(GAP_DATA.gaps[a]).reduce((s, c) => s + c.coverage_pct, 0) / Object.keys(GAP_DATA.gaps[a]).length;
+    const avgB = Object.values(GAP_DATA.gaps[b]).reduce((s, c) => s + c.coverage_pct, 0) / Object.keys(GAP_DATA.gaps[b]).length;
+    return avgA - avgB;
+  });
+
+  exchOrder.forEach((exch, ei) => {
     const summary = getExchSummary(exch);
 
     // Exchange summary row
