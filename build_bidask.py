@@ -1,8 +1,8 @@
 """Build bidask.json from L2 orderbook data.
 
 Reads raw/l2_orderbook_1min_0309.parquet and computes per-exchange, per-coin
-bid/ask at $10k impact, aggregated to 30-minute buckets.
-Two views: median and max.
+bid/ask at $10k and $100k impact, aggregated to 30-minute buckets.
+Two views: median and max.  Two impact sizes: 10k and 100k.
 Only includes coins present on 2+ exchanges.
 """
 import json
@@ -31,7 +31,8 @@ print("Reading L2 parquet...")
 df = pd.read_parquet(
     PARQUET,
     columns=["exchange", "symbol", "minute_utc",
-             "slippage_10k_buy_bps", "slippage_10k_sell_bps"],
+             "slippage_10k_buy_bps", "slippage_10k_sell_bps",
+             "slippage_100k_buy_bps", "slippage_100k_sell_bps"],
 )
 print(f"  {len(df):,} rows")
 
@@ -41,6 +42,7 @@ df["minute_utc"] = pd.to_datetime(df["minute_utc"])
 
 # Round-trip bidask in bps
 df["bidask_bps"] = df["slippage_10k_buy_bps"] + df["slippage_10k_sell_bps"]
+df["bidask_100k_bps"] = df["slippage_100k_buy_bps"] + df["slippage_100k_sell_bps"]
 
 # ── Filter to coins on 2+ exchanges ─────────────────────────────────────────
 coin_exch_count = df.groupby("coin")["exchange"].nunique()
@@ -64,10 +66,13 @@ print(f"  {n_buckets} half-hour buckets")
 bucket_timestamps = [int(b.timestamp() * 1000) for b in all_buckets]
 
 # ── Aggregate median/max per exchange+coin+bucket ───────────────────────────
-print("Aggregating bidask (median/max)...")
-agg = df.groupby(["exchange", "coin", "bucket"])["bidask_bps"].agg(["median", "max"])
-agg.columns = ["median", "max"]
-agg = agg.reset_index()
+print("Aggregating bidask (median/max) for 10k and 100k...")
+agg = df.groupby(["exchange", "coin", "bucket"]).agg(
+    median=("bidask_bps", "median"),
+    max=("bidask_bps", "max"),
+    median_100k=("bidask_100k_bps", "median"),
+    max_100k=("bidask_100k_bps", "max"),
+).reset_index()
 
 exchanges = sorted(df["exchange"].unique())
 bidask_data = {exch: {} for exch in exchanges}
@@ -77,7 +82,10 @@ print("Building per-coin arrays...")
 agg_lookup = {}
 for _, row in agg.iterrows():
     key = (row["exchange"], row["coin"], row["bucket"])
-    agg_lookup[key] = (round(float(row["median"]), 1), round(float(row["max"]), 1))
+    agg_lookup[key] = (
+        round(float(row["median"]), 1), round(float(row["max"]), 1),
+        round(float(row["median_100k"]), 1), round(float(row["max_100k"]), 1),
+    )
 
 ec_groups = agg.groupby(["exchange", "coin"])
 total_groups = len(ec_groups)
@@ -89,23 +97,33 @@ for gi, ((exch, coin), grp) in enumerate(ec_groups):
 
     median_arr = [None] * n_buckets
     max_arr = [None] * n_buckets
+    median_100k_arr = [None] * n_buckets
+    max_100k_arr = [None] * n_buckets
 
     # Fill median/max from agg lookup
     overall_medians = []
+    overall_medians_100k = []
     for bi, bucket in enumerate(all_buckets):
         key = (exch, coin, bucket)
         if key in agg_lookup:
-            median_arr[bi], max_arr[bi] = agg_lookup[key]
+            median_arr[bi], max_arr[bi], median_100k_arr[bi], max_100k_arr[bi] = agg_lookup[key]
             overall_medians.append(median_arr[bi])
+            overall_medians_100k.append(median_100k_arr[bi])
 
     overall_median = round(float(np.median(overall_medians)), 1) if overall_medians else None
     overall_max = round(float(np.median([v for v in max_arr if v is not None])), 1) if any(v is not None for v in max_arr) else None
+    overall_median_100k = round(float(np.median(overall_medians_100k)), 1) if overall_medians_100k else None
+    overall_max_100k = round(float(np.median([v for v in max_100k_arr if v is not None])), 1) if any(v is not None for v in max_100k_arr) else None
 
     bidask_data[exch][coin] = {
         "median_bps": overall_median,
         "max_bps": overall_max,
         "median": median_arr,
         "max": max_arr,
+        "median_bps_100k": overall_median_100k,
+        "max_bps_100k": overall_max_100k,
+        "median_100k": median_100k_arr,
+        "max_100k": max_100k_arr,
     }
 
 # ── Exchange-level summary arrays ───────────────────────────────────────────
@@ -116,22 +134,36 @@ for exch in exchanges:
     n_coins = len(coins)
     median_summary = [None] * n_buckets
     max_summary = [None] * n_buckets
+    median_100k_summary = [None] * n_buckets
+    max_100k_summary = [None] * n_buckets
     for bi in range(n_buckets):
         med_vals = [c["median"][bi] for c in coins.values() if c["median"][bi] is not None]
         max_vals = [c["max"][bi] for c in coins.values() if c["max"][bi] is not None]
+        med_100k_vals = [c["median_100k"][bi] for c in coins.values() if c["median_100k"][bi] is not None]
+        max_100k_vals = [c["max_100k"][bi] for c in coins.values() if c["max_100k"][bi] is not None]
         if med_vals:
             median_summary[bi] = round(float(np.median(med_vals)), 1)
         if max_vals:
             max_summary[bi] = round(float(np.median(max_vals)), 1)
+        if med_100k_vals:
+            median_100k_summary[bi] = round(float(np.median(med_100k_vals)), 1)
+        if max_100k_vals:
+            max_100k_summary[bi] = round(float(np.median(max_100k_vals)), 1)
 
     overall_med = round(float(np.median([c["median_bps"] for c in coins.values() if c["median_bps"] is not None])), 1)
     overall_max = round(float(np.median([c["max_bps"] for c in coins.values() if c["max_bps"] is not None])), 1)
+    overall_med_100k = round(float(np.median([c["median_bps_100k"] for c in coins.values() if c["median_bps_100k"] is not None])), 1)
+    overall_max_100k = round(float(np.median([c["max_bps_100k"] for c in coins.values() if c["max_bps_100k"] is not None])), 1)
     exch_summary[exch] = {
         "n_coins": n_coins,
         "median_bps": overall_med,
         "max_bps": overall_max,
         "median": median_summary,
         "max": max_summary,
+        "median_bps_100k": overall_med_100k,
+        "max_bps_100k": overall_max_100k,
+        "median_100k": median_100k_summary,
+        "max_100k": max_100k_summary,
     }
 
 # ── Write output ─────────────────────────────────────────────────────────────

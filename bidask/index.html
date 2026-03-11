@@ -113,12 +113,16 @@
 <body>
 
 <h2>L2 Bid/Ask Viewer</h2>
-<p class="sub">Bid/ask at $10k impact (round-trip bps) &nbsp;|&nbsp; 30-min buckets &nbsp;|&nbsp; click exchange for per-coin detail</p>
+<p class="sub" id="subtitle">Bid/ask at $10k impact (round-trip bps) &nbsp;|&nbsp; 30-min buckets &nbsp;|&nbsp; click exchange for per-coin detail</p>
 
 <div class="top-bar">
   <div class="toggle-group">
     <button class="toggle-btn active" data-mode="median">Median</button>
     <button class="toggle-btn" data-mode="max">Max</button>
+  </div>
+  <div class="toggle-group">
+    <button class="toggle-btn active" data-impact="10k">$10k</button>
+    <button class="toggle-btn" data-impact="100k">$100k</button>
   </div>
   <div class="legend">
     <div class="legend-item"><div class="legend-swatch" style="background:#1a9641"></div> &le;5 bps</div>
@@ -139,12 +143,15 @@
 
 <script>
 const MODE_LABELS = { median: 'median', max: 'max' };
-const MODE_STAT_KEY = { median: 'median_bps', max: 'max_bps' };
 const MODE_COL_LABEL = { median: 'Med bps', max: 'Max bps' };
 let BD = null;  // bidask data
 let mode = 'median';
+let impact = '10k';
 let selectedExch = null;
 const coinSort = {};
+
+function arrKey() { return impact === '10k' ? mode : mode + '_100k'; }
+function statKey() { return impact === '10k' ? mode + '_bps' : mode + '_bps_100k'; }
 
 const ABBREV = {
   Aster: 'AS', Binance: 'BN', Bybit: 'BY',
@@ -266,9 +273,14 @@ function render() {
   const container = document.getElementById('exch-summary');
   container.innerHTML = '';
 
-  const statKey = MODE_STAT_KEY[mode];
+  // Update subtitle
+  document.getElementById('subtitle').innerHTML =
+    `Bid/ask at $${impact} impact (round-trip bps) &nbsp;|&nbsp; 30-min buckets &nbsp;|&nbsp; click exchange for per-coin detail`;
+
+  const sk = statKey();
+  const ak = arrKey();
   const exchOrder = BD.exchanges.slice().sort((a, b) => {
-    return BD.exchange_summary[a][statKey] - BD.exchange_summary[b][statKey];
+    return BD.exchange_summary[a][sk] - BD.exchange_summary[b][sk];
   });
 
   const hdr = document.createElement('div');
@@ -281,7 +293,7 @@ function render() {
   exchOrder.forEach((exch, ei) => {
     const s = BD.exchange_summary[exch];
     const abbr = ABBREV[exch] || exch;
-    const statVal = s[statKey];
+    const statVal = s[sk];
     const row = document.createElement('div');
     row.className = 'exch-row' + (ei % 2 === 0 ? ' even' : '');
     row.dataset.exch = exch;
@@ -295,10 +307,10 @@ function render() {
     wrap.className = 'heatmap-wrap';
     const canvas = document.createElement('canvas');
     canvas.style.imageRendering = 'pixelated';
-    renderHeatmapCanvas(canvas, s[mode]);
+    renderHeatmapCanvas(canvas, s[ak]);
     wrap.appendChild(canvas);
 
-    const arr = s[mode];
+    const arr = s[ak];
     wrap.addEventListener('mousemove', e => showTooltip(e, arr));
     wrap.addEventListener('mouseleave', hideTooltip);
 
@@ -318,7 +330,7 @@ function renderCoinDetail(container, exch) {
   if (!coinSort[exch]) coinSort[exch] = { col: 'bidask', asc: true };
   const st = coinSort[exch];
 
-  const coinStatKey = MODE_STAT_KEY[mode];
+  const coinStatKey = statKey();
   const coins = Object.keys(exchData).sort((a, b) => {
     let cmp;
     if (st.col === 'name') cmp = a.localeCompare(b);
@@ -368,14 +380,15 @@ function renderCoinDetail(container, exch) {
     label.innerHTML = `<span class="name col-name-w">${coin}</span>`
       + `<span class="stat col-stat-w" style="color:${statColor(coinStatVal)}">${coinStatVal}</span>`;
 
+    const ak = arrKey();
     const wrap = document.createElement('div');
     wrap.className = 'heatmap-wrap';
     const canvas = document.createElement('canvas');
     canvas.style.imageRendering = 'pixelated';
-    renderHeatmapCanvas(canvas, info[mode]);
+    renderHeatmapCanvas(canvas, info[ak]);
     wrap.appendChild(canvas);
 
-    const arr = info[mode];
+    const arr = info[ak];
     wrap.addEventListener('mousemove', e => showTooltip(e, arr));
     wrap.addEventListener('mouseleave', hideTooltip);
 
@@ -391,24 +404,25 @@ function renderCoinDetail(container, exch) {
       const isOpen = detail.classList.contains('open');
       container.querySelectorAll('.coin-detail-panel.open').forEach(p => p.classList.remove('open'));
       if (!isOpen) {
-        if (!detail.dataset.built) {
-          const medArr = info.median.filter(v => v != null);
-          const maxArr = info.max.filter(v => v != null);
-          const pct = (arr) => {
-            const s = arr.slice().sort((a, b) => a - b);
-            return (p) => s[Math.floor(p / 100 * (s.length - 1))];
-          };
-          const mp = pct(medArr);
-          const xp = pct(maxArr);
-          const coverage = ((medArr.length / BD.n_buckets) * 100).toFixed(1);
-          detail.innerHTML = `<b>${coin}</b> on ${exch}<br>`
-            + `Coverage: ${coverage}% of buckets<br>`
-            + `Median &mdash; p5: ${mp(5).toFixed(1)}, p25: ${mp(25).toFixed(1)}, `
-            + `p50: ${mp(50).toFixed(1)}, p75: ${mp(75).toFixed(1)}, p95: ${mp(95).toFixed(1)} bps<br>`
-            + `Max &mdash; p5: ${xp(5).toFixed(1)}, p25: ${xp(25).toFixed(1)}, `
-            + `p50: ${xp(50).toFixed(1)}, p75: ${xp(75).toFixed(1)}, p95: ${xp(95).toFixed(1)} bps`;
-          detail.dataset.built = '1';
-        }
+        // Always rebuild so it reflects current impact selection
+        const suffix = impact === '10k' ? '' : '_100k';
+        const medKey = 'median' + suffix;
+        const maxKey = 'max' + suffix;
+        const medArr = info[medKey].filter(v => v != null);
+        const maxArr = info[maxKey].filter(v => v != null);
+        const pct = (arr) => {
+          const s = arr.slice().sort((a, b) => a - b);
+          return (p) => s[Math.floor(p / 100 * (s.length - 1))];
+        };
+        const mp = pct(medArr);
+        const xp = pct(maxArr);
+        const coverage = ((medArr.length / BD.n_buckets) * 100).toFixed(1);
+        detail.innerHTML = `<b>${coin}</b> on ${exch} ($${impact} impact)<br>`
+          + `Coverage: ${coverage}% of buckets<br>`
+          + `Median &mdash; p5: ${mp(5).toFixed(1)}, p25: ${mp(25).toFixed(1)}, `
+          + `p50: ${mp(50).toFixed(1)}, p75: ${mp(75).toFixed(1)}, p95: ${mp(95).toFixed(1)} bps<br>`
+          + `Max &mdash; p5: ${xp(5).toFixed(1)}, p25: ${xp(25).toFixed(1)}, `
+          + `p50: ${xp(50).toFixed(1)}, p75: ${xp(75).toFixed(1)}, p95: ${xp(95).toFixed(1)} bps`;
         detail.classList.add('open');
       }
     };
@@ -419,16 +433,29 @@ function renderCoinDetail(container, exch) {
 }
 
 // ── Toggle mode ──────────────────────────────────────────────────────────
-document.querySelectorAll('.toggle-btn').forEach(btn => {
+function refreshAll() {
+  render();
+  if (selectedExch) {
+    document.querySelector(`.exch-row[data-exch="${selectedExch}"]`).classList.add('selected');
+    renderCoinDetail(document.getElementById('coin-detail-inner'), selectedExch);
+  }
+}
+
+document.querySelectorAll('.toggle-btn[data-mode]').forEach(btn => {
   btn.onclick = () => {
     mode = btn.dataset.mode;
-    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.toggle-btn[data-mode]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    render();
-    if (selectedExch) {
-      document.querySelector(`.exch-row[data-exch="${selectedExch}"]`).classList.add('selected');
-      renderCoinDetail(document.getElementById('coin-detail-inner'), selectedExch);
-    }
+    refreshAll();
+  };
+});
+
+document.querySelectorAll('.toggle-btn[data-impact]').forEach(btn => {
+  btn.onclick = () => {
+    impact = btn.dataset.impact;
+    document.querySelectorAll('.toggle-btn[data-impact]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    refreshAll();
   };
 });
 
