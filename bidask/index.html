@@ -6,19 +6,19 @@
 <title>L2 Bid/Ask Viewer</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #f5f5f0; color: #222; font-family: monospace; font-size: 11px; padding: 16px; }
-  h2 { font-size: 14px; margin-bottom: 4px; }
-  p.sub { color: #666; font-size: 10px; margin-bottom: 12px; }
+  body { background: #1a1a2e; color: #d0d0d0; font-family: monospace; font-size: 11px; padding: 16px; }
+  h2 { font-size: 14px; margin-bottom: 4px; color: #e0e0e0; }
+  p.sub { color: #888; font-size: 10px; margin-bottom: 12px; }
 
   .top-bar { display: flex; align-items: center; gap: 16px; margin-bottom: 10px; }
-  .legend { display: flex; gap: 16px; font-size: 10px; color: #666; }
+  .legend { display: flex; gap: 16px; font-size: 10px; color: #888; }
   .legend-item { display: flex; align-items: center; gap: 4px; }
   .legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
 
   .toggle-group { display: flex; gap: 0; }
   .toggle-btn {
     padding: 3px 10px; font-family: monospace; font-size: 10px;
-    border: 1px solid #999; background: #e8e8e2; cursor: pointer; color: #444;
+    border: 1px solid #555; background: #2a2a3e; cursor: pointer; color: #aaa;
   }
   .toggle-btn:first-child { border-radius: 3px 0 0 3px; }
   .toggle-btn:last-child { border-radius: 0 3px 3px 0; border-left: none; }
@@ -33,63 +33,63 @@
   #exch-summary { margin-bottom: 0; }
   .exch-header {
     display: flex; align-items: center; padding: 3px 0;
-    border-bottom: 2px solid #bbb; background: #e0e0d8;
-    font-size: 10px; font-weight: bold; color: #444;
+    border-bottom: 2px solid #444; background: #252540;
+    font-size: 10px; font-weight: bold; color: #999;
   }
   .exch-header div { padding: 0 8px; }
   .exch-row {
     display: flex; align-items: center; padding: 3px 0; cursor: pointer;
-    border-bottom: 1px solid #d8d8d0;
+    border-bottom: 1px solid #2a2a3e;
   }
-  .exch-row:hover { background: #eeeee8; }
-  .exch-row.even { background: #fafaf5; }
-  .exch-row.even:hover { background: #eeeee8; }
-  .exch-row.selected { background: #dde4ec; }
+  .exch-row:hover { background: #2e2e48; }
+  .exch-row.even { background: #1e1e34; }
+  .exch-row.even:hover { background: #2e2e48; }
+  .exch-row.selected { background: #2a3a55; }
   .exch-label {
     display: flex; align-items: center; gap: 0; font-size: 11px; padding: 0 8px;
   }
   .exch-label .ename { font-size: 11px; }
   .exch-label .estat { text-align: right; padding-right: 12px; font-size: 10px; }
   .heatmap-wrap {
-    flex: 1; height: 14px; position: relative; background: #ddd;
+    flex: 1; height: 14px; position: relative; background: #333;
     border-radius: 2px; overflow: hidden;
   }
   .heatmap-wrap canvas { width: 100%; height: 100%; display: block; }
 
   /* ── Coin detail area ── */
-  #coin-detail { display: none; border-top: 2px solid #aaa; margin-top: 4px; }
+  #coin-detail { display: none; border-top: 2px solid #555; margin-top: 4px; }
   #coin-detail.open { display: block; }
   #coin-detail-header {
-    padding: 6px 8px; background: #e0e0d8; font-size: 12px; font-weight: bold;
-    border-bottom: 1px solid #ccc;
+    padding: 6px 8px; background: #252540; font-size: 12px; font-weight: bold;
+    border-bottom: 1px solid #444; color: #ccc;
   }
   .coin-detail-inner { max-height: calc(100vh - 260px); overflow-y: auto; }
 
   .col-header {
     display: flex; align-items: stretch; padding: 0;
-    border-bottom: 2px solid #bbb; background: #e8e8e2; position: sticky; top: 0; z-index: 1;
+    border-bottom: 2px solid #444; background: #252540; position: sticky; top: 0; z-index: 1;
   }
   .col-header .col {
     padding: 4px 8px; cursor: pointer; font-weight: bold; font-size: 10px;
-    user-select: none; color: #444; display: flex; align-items: flex-end;
+    user-select: none; color: #999; display: flex; align-items: flex-end;
   }
-  .col-header .col:hover { color: #000; }
-  .col-header .col.active { color: #3a6ea8; }
+  .col-header .col:hover { color: #ddd; }
+  .col-header .col.active { color: #6aacf0; }
   .col-header .col-stat { justify-content: flex-end; padding-right: 12px; }
   .col-header .col-timeline { flex: 1; position: relative; cursor: default; padding: 0; }
   .date-tick {
-    position: absolute; bottom: 2px; font-size: 9px; color: #888;
-    border-left: 1px solid #ccc; padding-left: 2px;
+    position: absolute; bottom: 2px; font-size: 9px; color: #666;
+    border-left: 1px solid #444; padding-left: 2px;
     white-space: nowrap; font-weight: normal;
   }
 
   .coin-row {
     display: flex; align-items: center; padding: 3px 0; cursor: pointer;
-    border-bottom: 1px solid #e0e0d8;
+    border-bottom: 1px solid #2a2a3e;
   }
-  .coin-row:hover { background: #eeeee8; }
-  .coin-row.even { background: #fafaf5; }
-  .coin-row.even:hover { background: #eeeee8; }
+  .coin-row:hover { background: #2e2e48; }
+  .coin-row.even { background: #1e1e34; }
+  .coin-row.even:hover { background: #2e2e48; }
   .coin-label {
     display: flex; align-items: center; gap: 0; font-size: 11px; padding: 0 8px;
   }
@@ -97,14 +97,14 @@
   .coin-label .stat { text-align: right; padding-right: 12px; font-size: 10px; }
 
   .coin-detail-panel {
-    display: none; background: #f9f9f4; border: 1px solid #ddd; border-radius: 4px;
-    margin: 3px 0 6px 170px; padding: 8px 12px; font-size: 10px;
+    display: none; background: #222238; border: 1px solid #444; border-radius: 4px;
+    margin: 3px 0 6px 170px; padding: 8px 12px; font-size: 10px; color: #bbb;
   }
   .coin-detail-panel.open { display: block; }
 
   /* ── Tooltip ── */
   #tooltip {
-    display: none; position: fixed; background: #333; color: #fff;
+    display: none; position: fixed; background: #e0e0e0; color: #111;
     padding: 4px 8px; border-radius: 3px; font-size: 10px; font-family: monospace;
     white-space: nowrap; z-index: 100; pointer-events: none; line-height: 1.5;
   }
@@ -127,7 +127,7 @@
     <div class="legend-item"><div class="legend-swatch" style="background:#fee08b"></div> 15 bps</div>
     <div class="legend-item"><div class="legend-swatch" style="background:#f46d43"></div> 25 bps</div>
     <div class="legend-item"><div class="legend-swatch" style="background:#d73027"></div> &ge;40 bps</div>
-    <div class="legend-item"><div class="legend-swatch" style="background:#ddd"></div> No data</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#323246"></div> No data</div>
   </div>
 </div>
 
@@ -154,7 +154,7 @@ const ABBREV = {
 
 // ── Color scale ──────────────────────────────────────────────────────────
 function bidaskColor(bps) {
-  if (bps == null) return [221, 221, 221];
+  if (bps == null) return [50, 50, 70];
   if (bps <= 5)  return lerpRGB([26,150,65],  [166,217,106], bps / 5);
   if (bps <= 15) return lerpRGB([166,217,106],[254,224,139], (bps - 5) / 10);
   if (bps <= 30) return lerpRGB([254,224,139],[244,109,67],  (bps - 15) / 15);
@@ -172,10 +172,10 @@ function lerpRGB(a, b, t) {
 }
 
 function statColor(bps) {
-  if (bps <= 5) return '#1a9641';
-  if (bps <= 10) return '#6aaa3a';
-  if (bps <= 20) return '#c08020';
-  return '#c03';
+  if (bps <= 5) return '#4ade80';
+  if (bps <= 10) return '#a3d96a';
+  if (bps <= 20) return '#e0a030';
+  return '#f06050';
 }
 
 // ── Canvas heatmap rendering ─────────────────────────────────────────────
