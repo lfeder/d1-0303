@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basis Trade Viewer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #1a1a2e; color: #d0d0d0; font-family: monospace; font-size: 11px; padding: 16px; }
+  h2 { font-size: 14px; margin-bottom: 4px; color: #e0e0e0; }
+  p.sub { color: #888; font-size: 10px; margin-bottom: 8px; }
+
+  /* ── Controls ── */
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .ctrl-group { display: flex; align-items: center; gap: 4px; }
+  .ctrl-label { font-size: 10px; color: #888; }
+  .toggle-group { display: flex; gap: 0; }
+  .toggle-btn {
+    padding: 3px 10px; font-family: monospace; font-size: 10px;
+    border: 1px solid #555; background: #2a2a3e; cursor: pointer; color: #aaa;
+  }
+  .toggle-btn:first-child { border-radius: 3px 0 0 3px; }
+  .toggle-btn:last-child { border-radius: 0 3px 3px 0; border-left: none; }
+  .toggle-btn:not(:first-child):not(:last-child) { border-left: none; }
+  .toggle-btn.active { background: #3a6ea8; color: #fff; border-color: #3a6ea8; }
+  select {
+    font-family: monospace; font-size: 10px; padding: 2px 4px;
+    background: #2a2a3e; color: #ddd; border: 1px solid #555; border-radius: 3px;
+  }
+
+  /* ── Rules section ── */
+  .rules {
+    background: #222238; border: 1px solid #333; border-radius: 4px;
+    padding: 8px 12px; margin-bottom: 12px; font-size: 10px; color: #999;
+    line-height: 1.6; max-width: 800px;
+  }
+  .rules strong { color: #bbb; }
+  .rules code { color: #7ab; background: #1a1a2e; padding: 0 3px; border-radius: 2px; }
+
+  /* ── Summary stats ── */
+  .summary {
+    display: flex; gap: 20px; margin-bottom: 10px; font-size: 11px; color: #ccc;
+    background: #222238; border: 1px solid #333; border-radius: 4px; padding: 6px 12px;
+  }
+  .summary .stat-val { color: #6aacf0; font-weight: bold; }
+  .summary .stat-neg { color: #e07070; }
+
+  /* ── Legend ── */
+  .legend { display: flex; gap: 14px; margin-bottom: 8px; font-size: 10px; color: #888; }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
+
+  /* ── Grid ── */
+  #grid-wrap { overflow-x: auto; }
+  table.grid { border-collapse: collapse; width: 100%; min-width: 900px; }
+  table.grid th {
+    position: sticky; top: 0; z-index: 2;
+    background: #252540; color: #999; font-size: 10px; font-weight: bold;
+    padding: 4px 6px; border-bottom: 2px solid #444; white-space: nowrap;
+  }
+  table.grid th.coin-col { text-align: left; width: 70px; min-width: 70px; }
+  table.grid th.pl-col { text-align: right; width: 60px; min-width: 60px; }
+  table.grid th.n-col { text-align: right; width: 30px; min-width: 30px; }
+  table.grid th.date-col { text-align: center; font-weight: normal; font-size: 9px; }
+
+  table.grid td { padding: 2px 3px; border-bottom: 1px solid #2a2a3e; vertical-align: middle; }
+  table.grid td.coin-cell { font-weight: bold; font-size: 11px; white-space: nowrap; }
+  table.grid td.pl-cell { text-align: right; font-size: 10px; }
+  table.grid td.n-cell { text-align: right; font-size: 10px; color: #888; }
+  table.grid td.trade-cell { position: relative; height: 18px; padding: 0; }
+
+  table.grid tr:nth-child(even) td { background: #1e1e34; }
+  table.grid tr:hover td { background: #2e2e48 !important; }
+  table.grid tr.total-row td { border-top: 2px solid #444; background: #252540 !important; font-weight: bold; }
+
+  /* ── Trade blocks ── */
+  .trade-block {
+    position: absolute; top: 2px; bottom: 2px; border-radius: 2px;
+    cursor: pointer; min-width: 3px;
+  }
+
+  /* ── Tooltip ── */
+  #tooltip {
+    display: none; position: fixed; z-index: 100;
+    background: #1a1a2e; border: 1px solid #555; border-radius: 4px;
+    padding: 8px 10px; font-size: 10px; line-height: 1.6;
+    color: #ddd; pointer-events: none; max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+  #tooltip .tt-label { color: #888; }
+  #tooltip .tt-pos { color: #6aacf0; }
+  #tooltip .tt-neg { color: #e07070; }
+  #tooltip .tt-zombie { color: #888; }
+</style>
+</head>
+<body>
+
+<h2>Basis Trade Viewer</h2>
+<p class="sub">Cross-exchange basis trade backtest — Jan 23 to Feb 25, 2026</p>
+
+<div class="rules">
+  <strong>Strategy:</strong> When the same perp is priced differently across exchanges, go long on the cheap exchange and short on the expensive one. Wait for prices to converge, then unwind both sides.<br>
+  <strong>Entry:</strong> <code>entry_basis = (sell_short_exch &minus; buy_long_exch) / mid &times; 10000 &minus; fees</code><br>
+  &emsp;<code>entry_score = entry_basis &minus; median_bidask_long &minus; median_bidask_short</code><br>
+  &emsp;State machine tracks narrow&rarr;wide transitions per (coin, pair). Narrow: <code>entry_basis &lt; 10bp</code>. Wide: <code>entry_score &gt; entry_threshold</code>. Enter on narrow&rarr;wide transition.<br>
+  <strong>Exit:</strong> <code>exit_basis = (buy_short_exch &minus; sell_long_exch) / mid &times; 10000 + fees</code><br>
+  &emsp;Exit when <code>exit_basis &lt; exit_threshold</code>.<br>
+  <strong>P&amp;L:</strong> Spread P&amp;L (entry &minus; exit prices &minus; round-trip fees) + funding rate P&amp;L. One position per coin.
+</div>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Entry:</span>
+    <select id="sel-entry"></select>
+    <span class="ctrl-label">bp</span>
+  </div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Exit:</span>
+    <select id="sel-exit"></select>
+    <span class="ctrl-label">bp</span>
+  </div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Size:</span>
+    <div class="toggle-group" id="tg-size">
+      <button class="toggle-btn active" data-val="10">$10k</button>
+      <button class="toggle-btn" data-val="100">$100k</button>
+    </div>
+  </div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Exchanges:</span>
+    <div class="toggle-group" id="tg-exch">
+      <button class="toggle-btn active" data-val="all">All</button>
+      <button class="toggle-btn" data-val="dex">DEX only</button>
+    </div>
+  </div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">1-bar filter:</span>
+    <div class="toggle-group" id="tg-1bar">
+      <button class="toggle-btn" data-val="off">Off</button>
+      <button class="toggle-btn active" data-val="on">On</button>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#2d7a3a"></div> Profit</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#c0392b"></div> Loss</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#555"></div> Zombie (still open)</div>
+</div>
+
+<div class="summary" id="summary"></div>
+
+<div id="grid-wrap"><table class="grid" id="grid"></table></div>
+<div id="tooltip"></div>
+
+<script>
+let DATA = null;
+let currentParams = { entry: 50, exit: 10, size: 10, exch: "all", filter1bar: true };
+
+async function loadData() {
+  const resp = await fetch("basis.json");
+  DATA = await resp.json();
+  initControls();
+  render();
+}
+
+function initControls() {
+  const selEntry = document.getElementById("sel-entry");
+  DATA.entry_thresholds.forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v; opt.textContent = v;
+    if (v === 50) opt.selected = true;
+    selEntry.appendChild(opt);
+  });
+  selEntry.addEventListener("change", () => { currentParams.entry = +selEntry.value; render(); });
+
+  const selExit = document.getElementById("sel-exit");
+  DATA.exit_thresholds.forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v; opt.textContent = v;
+    if (v === 10) opt.selected = true;
+    selExit.appendChild(opt);
+  });
+  selExit.addEventListener("change", () => { currentParams.exit = +selExit.value; render(); });
+
+  setupToggle("tg-size", "size", v => +v);
+  setupToggle("tg-exch", "exch", v => v);
+  setupToggle("tg-1bar", "filter1bar", v => v === "on");
+}
+
+function setupToggle(id, param, parse) {
+  const wrap = document.getElementById(id);
+  wrap.querySelectorAll(".toggle-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      wrap.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentParams[param] = parse(btn.dataset.val);
+      render();
+    });
+  });
+}
+
+function getKey() {
+  return `${currentParams.size}k_${currentParams.exch}_e${currentParams.entry}_x${currentParams.exit}`;
+}
+
+function render() {
+  const key = getKey();
+  let trades = DATA.results[key] || [];
+
+  // Apply 1-bar filter: remove closed trades with duration <= 1 min
+  if (currentParams.filter1bar) {
+    trades = trades.filter(t => t.zombie || t.duration_min > 1);
+  }
+
+  renderSummary(trades);
+  renderGrid(trades);
+}
+
+function renderSummary(trades) {
+  const closed = trades.filter(t => !t.zombie);
+  const zombies = trades.filter(t => t.zombie);
+  const n = closed.length;
+  const wins = closed.filter(t => t.total_pl > 0).length;
+  const totalPl = closed.reduce((s, t) => s + (t.total_pl || 0), 0);
+  const spreadPl = closed.reduce((s, t) => s + (t.spread_pl || 0), 0);
+  const fundingPl = closed.reduce((s, t) => s + (t.funding_pl || 0), 0);
+  const avgPl = n > 0 ? totalPl / n : 0;
+  const avgHold = n > 0 ? closed.reduce((s, t) => s + t.duration_min, 0) / n / 60 : 0;
+
+  const plClass = totalPl >= 0 ? "stat-val" : "stat-neg";
+  document.getElementById("summary").innerHTML =
+    `<span>Trades: <span class="stat-val">${n}</span></span>` +
+    `<span>Win: <span class="stat-val">${n > 0 ? (wins/n*100).toFixed(1) : 0}%</span></span>` +
+    `<span>Total P&L: <span class="${plClass}">$${totalPl.toLocaleString(undefined,{maximumFractionDigits:0})}</span></span>` +
+    `<span>Spread: <span class="stat-val">$${spreadPl.toLocaleString(undefined,{maximumFractionDigits:0})}</span></span>` +
+    `<span>Funding: <span class="${fundingPl >= 0 ? 'stat-val' : 'stat-neg'}">$${fundingPl >= 0 ? '+' : ''}${fundingPl.toLocaleString(undefined,{maximumFractionDigits:0})}</span></span>` +
+    `<span>Avg P&L: <span class="${plClass}">$${avgPl.toFixed(0)}</span></span>` +
+    `<span>Avg Hold: <span class="stat-val">${avgHold.toFixed(1)}h</span></span>` +
+    `<span>Zombies: <span class="stat-val">${zombies.length}</span></span>`;
+}
+
+function renderGrid(trades) {
+  if (trades.length === 0) {
+    document.getElementById("grid").innerHTML = "<tr><td style='padding:20px;color:#888'>No trades for this configuration.</td></tr>";
+    return;
+  }
+
+  // Build date columns (daily buckets)
+  const allTs = trades.map(t => t.entry_ts).filter(Boolean);
+  const exitTs = trades.filter(t => t.exit_ts).map(t => t.exit_ts);
+  const minTs = Math.min(...allTs);
+  const maxTs = Math.max(...allTs, ...exitTs);
+
+  // Day boundaries (UTC)
+  const dayStart = new Date(minTs * 1000);
+  dayStart.setUTCHours(0, 0, 0, 0);
+  const dayEnd = new Date(maxTs * 1000);
+  dayEnd.setUTCHours(23, 59, 59, 999);
+
+  const days = [];
+  const d = new Date(dayStart);
+  while (d <= dayEnd) {
+    days.push({
+      ts: d.getTime() / 1000,
+      label: `${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`,
+    });
+    d.setUTCDate(d.getUTCDate() + 1);
+  }
+
+  const timeMin = days[0].ts;
+  const timeMax = days[days.length - 1].ts + 86400;
+  const timeSpan = timeMax - timeMin;
+
+  // Group by coin
+  const coinMap = {};
+  trades.forEach(t => {
+    if (!coinMap[t.coin]) coinMap[t.coin] = [];
+    coinMap[t.coin].push(t);
+  });
+
+  // Sort coins by total P&L descending (closed trades)
+  const coins = Object.keys(coinMap).sort((a, b) => {
+    const plA = coinMap[a].filter(t => !t.zombie).reduce((s, t) => s + (t.total_pl || 0), 0);
+    const plB = coinMap[b].filter(t => !t.zombie).reduce((s, t) => s + (t.total_pl || 0), 0);
+    return plB - plA;
+  });
+
+  // Build table
+  let html = "<thead><tr>";
+  html += `<th class="coin-col">Coin</th>`;
+  html += `<th class="pl-col">P&L</th>`;
+  html += `<th class="n-col">N</th>`;
+  days.forEach(day => {
+    html += `<th class="date-col">${day.label}</th>`;
+  });
+  html += "</tr></thead><tbody>";
+
+  // Total row data
+  const totalByDay = {};
+  let grandTotal = 0;
+  let grandN = 0;
+
+  coins.forEach((coin, ci) => {
+    const ct = coinMap[coin];
+    const closed = ct.filter(t => !t.zombie);
+    const pl = closed.reduce((s, t) => s + (t.total_pl || 0), 0);
+    const n = closed.length;
+    grandTotal += pl;
+    grandN += n;
+
+    const plColor = pl > 0 ? "#6aacf0" : pl < 0 ? "#e07070" : "#888";
+    html += `<tr>`;
+    html += `<td class="coin-cell">${coin}</td>`;
+    html += `<td class="pl-cell" style="color:${plColor}">$${pl.toFixed(0)}</td>`;
+    html += `<td class="n-cell">${n + ct.filter(t=>t.zombie).length}</td>`;
+
+    days.forEach(day => {
+      const dayTs = day.ts;
+      const dayEnd = dayTs + 86400;
+
+      // Find trades active during this day
+      const dayTrades = ct.filter(t => {
+        const entryTs = t.entry_ts;
+        const exitTs = t.zombie ? timeMax : t.exit_ts;
+        return entryTs < dayEnd && exitTs > dayTs;
+      });
+
+      html += `<td class="trade-cell">`;
+      dayTrades.forEach(t => {
+        const entryTs = t.entry_ts;
+        const exitTs = t.zombie ? timeMax : t.exit_ts;
+        // Position within the day
+        const blockStart = Math.max(entryTs, dayTs);
+        const blockEnd = Math.min(exitTs, dayEnd);
+        const left = ((blockStart - dayTs) / 86400 * 100).toFixed(1);
+        const width = Math.max(3, ((blockEnd - blockStart) / 86400 * 100)).toFixed(1);
+
+        let color;
+        if (t.zombie) {
+          color = "#555";
+        } else if (t.total_pl > 0) {
+          // Green gradient: darker for higher P&L
+          const intensity = Math.min(1, Math.abs(t.total_pl) / (currentParams.size * 30));
+          const g = Math.round(80 + intensity * 80);
+          color = `rgb(${Math.round(30 + intensity * 15)}, ${g}, ${Math.round(40 + intensity * 18)})`;
+        } else {
+          color = "#c0392b";
+        }
+
+        const tid = `t_${coin}_${t.entry_ts}`;
+        html += `<div class="trade-block" data-trade='${JSON.stringify(t).replace(/'/g, "&#39;")}'
+          style="left:${left}%;width:${width}%;background:${color};"
+          onmouseenter="showTip(event,this)" onmouseleave="hideTip()"></div>`;
+      });
+      html += `</td>`;
+
+      // Accumulate day totals
+      const dayPl = ct.filter(t => !t.zombie && t.exit_ts >= dayTs && t.exit_ts < dayEnd)
+                      .reduce((s, t) => s + (t.total_pl || 0), 0);
+      totalByDay[day.label] = (totalByDay[day.label] || 0) + dayPl;
+    });
+
+    html += `</tr>`;
+  });
+
+  // Total row
+  const totalPlColor = grandTotal > 0 ? "#6aacf0" : "#e07070";
+  html += `<tr class="total-row">`;
+  html += `<td class="coin-cell">TOTAL</td>`;
+  html += `<td class="pl-cell" style="color:${totalPlColor}">$${grandTotal.toFixed(0)}</td>`;
+  html += `<td class="n-cell">${grandN}</td>`;
+  days.forEach(day => {
+    const dp = totalByDay[day.label] || 0;
+    const c = dp > 0 ? "#6aacf0" : dp < 0 ? "#e07070" : "#555";
+    html += `<td class="pl-cell" style="font-size:9px;color:${c}">${dp !== 0 ? '$' + dp.toFixed(0) : ''}</td>`;
+  });
+  html += `</tr>`;
+
+  html += "</tbody>";
+  document.getElementById("grid").innerHTML = html;
+}
+
+function showTip(ev, el) {
+  const t = JSON.parse(el.dataset.trade);
+  const tip = document.getElementById("tooltip");
+
+  const entryDt = t.entry_ts ? new Date(t.entry_ts * 1000).toISOString().replace("T", " ").slice(5, 16) + " UTC" : "?";
+  const exitDt = t.exit_ts ? new Date(t.exit_ts * 1000).toISOString().replace("T", " ").slice(5, 16) + " UTC" : "still open";
+  const dur = t.duration_min >= 60 ? `${(t.duration_min / 60).toFixed(1)}h` : `${t.duration_min}m`;
+
+  let plHtml;
+  if (t.zombie) {
+    plHtml = `<span class="tt-zombie">Zombie (never converged)</span>`;
+  } else {
+    const plClass = t.total_pl >= 0 ? "tt-pos" : "tt-neg";
+    const spClass = t.spread_pl >= 0 ? "tt-pos" : "tt-neg";
+    const fuClass = t.funding_pl >= 0 ? "tt-pos" : "tt-neg";
+    plHtml = `<span class="tt-label">Spread P&L:</span> <span class="${spClass}">$${t.spread_pl.toFixed(1)}</span><br>` +
+             `<span class="tt-label">Funding P&L:</span> <span class="${fuClass}">$${t.funding_pl >= 0 ? '+' : ''}${t.funding_pl.toFixed(1)}</span><br>` +
+             `<span class="tt-label">Total P&L:</span> <span class="${plClass}">$${t.total_pl >= 0 ? '+' : ''}${t.total_pl.toFixed(1)}</span>`;
+  }
+
+  tip.innerHTML =
+    `<strong>${t.coin}</strong> <span class="tt-label">${t.pair}</span><br>` +
+    `<span class="tt-label">Entry:</span> ${entryDt} @ ${t.entry_basis_bp}bp<br>` +
+    `<span class="tt-label">Exit:</span> ${exitDt}<br>` +
+    `<span class="tt-label">Duration:</span> ${dur}<br>` +
+    plHtml;
+
+  tip.style.display = "block";
+  positionTip(ev);
+}
+
+function positionTip(ev) {
+  const tip = document.getElementById("tooltip");
+  let x = ev.clientX + 12;
+  let y = ev.clientY + 12;
+  if (x + 280 > window.innerWidth) x = ev.clientX - 280;
+  if (y + 150 > window.innerHeight) y = ev.clientY - 150;
+  tip.style.left = x + "px";
+  tip.style.top = y + "px";
+}
+
+function hideTip() {
+  document.getElementById("tooltip").style.display = "none";
+}
+
+document.addEventListener("mousemove", ev => {
+  if (document.getElementById("tooltip").style.display === "block") positionTip(ev);
+});
+
+loadData();
+</script>
+</body>
+</html>
