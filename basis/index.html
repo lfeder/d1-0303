@@ -377,14 +377,13 @@ function renderGrid(trades) {
 
         let color;
         if (t.zombie) {
-          color = "#555";
+          color = "#777";
         } else if (t.total_pl > 0) {
-          // Green gradient: darker for higher P&L
           const intensity = Math.min(1, Math.abs(t.total_pl) / (currentParams.size * 30));
-          const g = Math.round(80 + intensity * 80);
-          color = `rgb(${Math.round(30 + intensity * 15)}, ${g}, ${Math.round(40 + intensity * 18)})`;
+          const g = Math.round(130 + intensity * 125);
+          color = `rgb(${Math.round(30 + intensity * 40)}, ${g}, ${Math.round(50 + intensity * 30)})`;
         } else {
-          color = "#c0392b";
+          color = "#e74c3c";
         }
 
         html += `<div class="trade-block" data-trade='${JSON.stringify(t).replace(/'/g, "&#39;")}'
