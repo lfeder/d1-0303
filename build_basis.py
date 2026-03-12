@@ -30,6 +30,7 @@ def trade_to_dict(t):
         "exit_ts": int(t["exit_ts"].timestamp()) if t["exit_ts"] else None,
         "duration_min": t["duration_min"],
         "entry_basis_bp": t["entry_basis_bp"],
+        "exit_basis_bp": t.get("exit_basis_bp"),
         "spread_pl": t["pl_spread_usd"],
         "funding_pl": t["funding_usd"],
         "total_pl": t["pl_usd"],

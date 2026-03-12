@@ -151,7 +151,7 @@
 <div id="grid-wrap"><table class="grid" id="grid"></table></div>
 
 <div class="rules" style="margin-top: 14px;">
-  <strong>Strategy:</strong> When the same perp is priced differently across exchanges, go long on the cheap exchange and short on the expensive one. Wait for prices to converge, then unwind both sides.<br>
+  <strong>Rules</strong><br>
   <strong>Entry:</strong> <code>entry_basis = (sell_short_exch &minus; buy_long_exch) / mid &times; 10000 &minus; fees</code><br>
   &emsp;<code>entry_score = entry_basis &minus; median_bidask_long &minus; median_bidask_short</code><br>
   &emsp;State machine tracks narrow&rarr;wide transitions per (coin, pair). Narrow: <code>entry_basis &lt; 10bp</code>. Wide: <code>entry_score &gt; entry_threshold</code>. Enter on narrow&rarr;wide transition.<br>
@@ -432,7 +432,7 @@ function showTip(ev, el) {
   tip.innerHTML =
     `<strong>${t.coin}</strong> <span class="tt-label">${t.pair}</span><br>` +
     `<span class="tt-label">Entry:</span> ${entryDt} @ ${t.entry_basis_bp}bp<br>` +
-    `<span class="tt-label">Exit:</span> ${exitDt}<br>` +
+    `<span class="tt-label">Exit:</span> ${exitDt}${t.exit_basis_bp != null ? ' @ ' + t.exit_basis_bp + 'bp' : ''}<br>` +
     `<span class="tt-label">Duration:</span> ${dur}<br>` +
     plHtml;
 

@@ -299,6 +299,7 @@ def run_sim(data, wide_threshold, wait_entry=True, wait_exit=False, max_position
                     "exit_date": exit_dt.strftime("%m-%d"),
                     "duration_min": tick_min - pos["entry_tick"],
                     "entry_basis_bp": round(pos["entry_basis_bp"], 1),
+                    "exit_basis_bp": round(float(xb), 1),
                     "pl_spread_usd": round(float(pl_spread), 2),
                     "funding_bp": round(float(funding_bp), 2),
                     "funding_usd": round(float(funding_usd), 2),
@@ -418,6 +419,10 @@ def run_sim(data, wide_threshold, wait_entry=True, wait_exit=False, max_position
         l_name = ABBREV[l_ex]
         s_name = ABBREV[s_ex]
 
+        # Last exit basis
+        last_xb = exit_basis[last_t, c_idx, p_idx]
+        last_xb_val = round(float(last_xb), 1) if not np.isnan(last_xb) else None
+
         # Mark-to-market spread P&L using last tick prices
         sell_l = sell_t[last_t, c_idx, pos["l_idx"]]
         buy_s_val = buy_t[last_t, c_idx, pos["s_idx"]]
@@ -452,6 +457,7 @@ def run_sim(data, wide_threshold, wait_entry=True, wait_exit=False, max_position
             "exit_date": None,
             "duration_min": dur,
             "entry_basis_bp": round(pos["entry_basis_bp"], 1),
+            "exit_basis_bp": last_xb_val,
             "pl_spread_usd": pl_spread,
             "funding_bp": round(float(funding_bp), 2),
             "funding_usd": round(float(funding_usd), 2),
