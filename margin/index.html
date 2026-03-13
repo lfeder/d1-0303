@@ -393,8 +393,12 @@ Net P&amp;L: +${$(sampleLongPnl)} &minus; ${$(Math.abs(sampleShortPnl))} = <b>${
 Maintenance margin = ${(maintPct*100).toFixed(0)}% of deployed margin.<br>
 ${longExch}: ${(maintPct*100).toFixed(0)}% &times; ${$(longMargin)} = ${$(maintPct * longMargin)}. Liquidation when equity &le; ${$(maintPct * longMargin)}.<br>
 ${shortExch}: ${(maintPct*100).toFixed(0)}% &times; ${$(shortMargin)} = ${$(maintPct * shortMargin)}. Liquidation when equity &le; ${$(maintPct * shortMargin)}.<br>
-Both sides liquidate at the same price move: <b>&plusmn;${pct(liqMove)}</b>.<br>
-At liquidation the losing leg is closed, but the winning leg keeps its gain &mdash; net result is approximately break-even minus fees.
+Both sides liquidate at the same price move: <b>&plusmn;${pct(liqMove)}</b>.<br><br>
+<b>At liquidation (e.g. price moves +${pct(liqMove)}):</b><br>
+Short leg (${shortExch}) is liquidated &mdash; you lose all ${$(shortCapital)} capital on that exchange.<br>
+Long leg (${longExch}) gains: ${$(posSize)} &times; ${pct(liqMove)} = +${$(posSize * liqMove)}.<br>
+${longExch} equity: ${$(longCapital)} + ${$(posSize * liqMove)} = ${$(longCapital + posSize * liqMove)}.<br>
+Net: +${$(posSize * liqMove)} &minus; ${$(shortCapital)} = <b>${$(posSize * liqMove - shortCapital)}</b>.
 `;
 }
 
