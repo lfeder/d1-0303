@@ -11,6 +11,18 @@
   p.sub { color: #666; font-size: 10px; margin-bottom: 12px; }
   h3 { font-size: 12px; margin: 20px 0 6px; }
 
+  /* Tabs */
+  .tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 2px solid #bbb; }
+  .tab {
+    padding: 6px 18px; cursor: pointer; font-family: monospace; font-size: 12px; font-weight: bold;
+    background: #e0e0d8; border: 1px solid #bbb; border-bottom: none; border-radius: 6px 6px 0 0;
+    color: #666; margin-bottom: -2px;
+  }
+  .tab.active { background: #f5f5f0; color: #222; border-bottom: 2px solid #f5f5f0; }
+  .tab:hover:not(.active) { background: #d4d4d4; }
+  .page { display: none; }
+  .page.active { display: block; }
+
   /* Controls */
   .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 16px;
     background: #e8e8e4; padding: 10px 14px; border-radius: 6px; border: 1px solid #ccc; }
@@ -29,6 +41,8 @@
     background: #e0e0d8; color: #333; padding: 4px 6px; text-align: center;
     border: 1px solid #ccc; position: sticky; top: 0; z-index: 2; font-size: 10px;
   }
+  th.sortable { cursor: pointer; }
+  th.sortable:hover { background: #c8d8e8; }
   td { padding: 3px 6px; text-align: right; border: 1px solid #ddd; font-size: 10px; }
   td.coin { text-align: left; font-weight: bold; background: #e8e8e4; position: sticky; left: 0; z-index: 1; }
   tr:hover td { background: #d8e4f0; }
@@ -55,19 +69,25 @@
   .summary-card .label { font-size: 10px; color: #666; }
   .summary-card .value { font-size: 14px; font-weight: bold; margin-top: 2px; }
 
-  /* Toggle for leverage table */
-  .toggle-link { color: #3a6ea8; cursor: pointer; font-size: 11px; text-decoration: underline; }
-  .toggle-link:hover { color: #2a5a88; }
-  #lev-section { display: none; }
-  #lev-section.show { display: block; }
+  /* Leverage page */
+  .lev-controls { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 12px;
+    background: #e8e8e4; padding: 10px 14px; border-radius: 6px; border: 1px solid #ccc; }
+  .sort-arrow { font-size: 9px; margin-left: 2px; }
+  .lev-min { background: #fce4e4; }
+  .lev-max { background: #d4f0d4; }
 </style>
 </head>
 <body>
 
-<h2>Cross-Exchange Margin Simulator</h2>
-<p class="sub">Long perp on one exchange, short on another &mdash; see margin, position size, and P&L across price moves</p>
+<h2>Cross-Exchange Margin</h2>
+<div class="tabs">
+  <div class="tab active" data-page="page-sim">Margin Simulator</div>
+  <div class="tab" data-page="page-lev">Leverage Table</div>
+</div>
 
-<div class="section">
+<!-- PAGE 1: Margin Simulator -->
+<div class="page active" id="page-sim">
+  <p class="sub">Long perp on one exchange, short on another &mdash; leverage uses min(long exch, short exch) for both legs</p>
   <div class="controls">
     <div class="field">
       <label>Coin</label>
@@ -90,12 +110,8 @@
       <input id="deploy" type="number" value="50" step="5" min="5" max="100">
     </div>
     <div class="field">
-      <label>Long leverage</label>
-      <select id="long-lev"></select>
-    </div>
-    <div class="field">
-      <label>Short leverage</label>
-      <select id="short-lev"></select>
+      <label>Leverage (min of both)</label>
+      <select id="lev"></select>
     </div>
   </div>
 
@@ -111,24 +127,26 @@
   </div>
 </div>
 
-<div class="section">
-  <span class="toggle-link" id="lev-toggle">Show leverage table (60 coins × 6 exchanges)</span>
-  <div id="lev-section">
-    <h3>Max Leverage by Coin &amp; Exchange</h3>
-    <p class="sub">Representative max leverage tiers. Actual limits depend on position size and account level.</p>
-    <div class="wrap" style="max-height:50vh">
-      <table>
-        <thead id="lev-head"></thead>
-        <tbody id="lev-body"></tbody>
-      </table>
+<!-- PAGE 2: Leverage Table -->
+<div class="page" id="page-lev">
+  <p class="sub">Max leverage by coin &amp; exchange, sorted descending. Actual limits depend on position size and account level.</p>
+  <div class="lev-controls">
+    <div class="field">
+      <label>Sort by</label>
+      <select id="lev-sort">
+        <option value="coin">Coin (A-Z)</option>
+      </select>
     </div>
+  </div>
+  <div class="wrap" style="max-height:75vh">
+    <table id="lev-table">
+      <thead id="lev-head"></thead>
+      <tbody id="lev-body"></tbody>
+    </table>
   </div>
 </div>
 
 <script>
-// --- Leverage data: representative max leverage for each coin/exchange ---
-// Sources: exchange docs. These are base-tier max leverage for small positions.
-// BN/BY/OK typically offer higher leverage on majors. HL/LT/AS are lower.
 const EXCHANGES = ['BN','BY','OK','HL','LT','AS'];
 const EXCH_NAMES = {BN:'Binance',BY:'Bybit',OK:'OKX',HL:'Hyperliquid',LT:'Lighter',AS:'Aster'};
 
@@ -199,12 +217,21 @@ const LEV_DATA = {
 
 const COINS = Object.keys(LEV_DATA);
 
-// --- Populate controls ---
+// ===================== TABS =====================
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.page).classList.add('active');
+  });
+});
+
+// ===================== PAGE 1: MARGIN SIMULATOR =====================
 const coinSel = document.getElementById('coin');
 const longExchSel = document.getElementById('long-exch');
 const shortExchSel = document.getElementById('short-exch');
-const longLevSel = document.getElementById('long-lev');
-const shortLevSel = document.getElementById('short-lev');
+const levSel = document.getElementById('lev');
 const capitalIn = document.getElementById('capital');
 const deployIn = document.getElementById('deploy');
 
@@ -216,66 +243,49 @@ EXCHANGES.forEach(e => {
 longExchSel.value = 'HL';
 shortExchSel.value = 'BN';
 
-function populateLevOptions(sel, maxLev) {
-  const prev = parseInt(sel.value) || 0;
-  sel.innerHTML = '';
-  const steps = [1,2,3,5,10,15,20,25,50,75,100,125].filter(x => x <= maxLev);
-  steps.forEach(x => sel.add(new Option(x + 'x', x)));
-  // pick previous or max
-  const best = steps.includes(prev) ? prev : steps[steps.length - 1];
-  sel.value = best;
-}
-
 function updateLevOptions() {
   const coin = coinSel.value;
   const li = EXCHANGES.indexOf(longExchSel.value);
   const si = EXCHANGES.indexOf(shortExchSel.value);
-  populateLevOptions(longLevSel, LEV_DATA[coin][li]);
-  populateLevOptions(shortLevSel, LEV_DATA[coin][si]);
+  const maxLev = Math.min(LEV_DATA[coin][li], LEV_DATA[coin][si]);
+
+  const prev = parseInt(levSel.value) || 0;
+  levSel.innerHTML = '';
+  const steps = [1,2,3,5,10,15,20,25,50,75,100,125].filter(x => x <= maxLev);
+  steps.forEach(x => levSel.add(new Option(x + 'x', x)));
+  const best = steps.includes(prev) ? prev : steps[steps.length - 1];
+  levSel.value = best;
 }
 
-// --- Build leverage reference table ---
-function buildLevTable() {
-  const head = document.getElementById('lev-head');
-  const body = document.getElementById('lev-body');
-  head.innerHTML = '<tr><th style="position:sticky;left:0;z-index:3">Coin</th>' +
-    EXCHANGES.map(e => `<th>${e}</th>`).join('') + '</tr>';
-  body.innerHTML = COINS.map(coin => {
-    const levs = LEV_DATA[coin];
-    return '<tr><td class="coin">' + coin + '</td>' +
-      levs.map(l => `<td>${l}x</td>`).join('') + '</tr>';
-  }).join('');
-}
-
-// --- Compute and render PnL ---
 function compute() {
   const capital = parseFloat(capitalIn.value) || 10000;
   const deployPct = (parseFloat(deployIn.value) || 50) / 100;
-  const longLev = parseInt(longLevSel.value) || 10;
-  const shortLev = parseInt(shortLevSel.value) || 10;
+  const lev = parseInt(levSel.value) || 10;
 
-  const longMargin = capital * deployPct;
-  const shortMargin = capital * deployPct;
-  const longPos = longMargin * longLev;
-  const shortPos = shortMargin * shortLev;
+  const margin = capital * deployPct;
+  const posSize = margin * lev;
+  const liqPct = 1 / lev;
 
-  // Liquidation: long liq at -(1/longLev), short liq at +(1/shortLev)
-  const longLiqPct = -1 / longLev;
-  const shortLiqPct = 1 / shortLev;
-
-  // Summary
   const summary = document.getElementById('summary');
   const totalCapital = capital * 2;
-  const totalMarginUsed = longMargin + shortMargin;
   const fmtK = v => v >= 1000 ? '$' + (v/1000).toFixed(1) + 'k' : '$' + v.toFixed(0);
+
+  const longExch = longExchSel.value;
+  const shortExch = shortExchSel.value;
+  const coin = coinSel.value;
+  const li = EXCHANGES.indexOf(longExch);
+  const si = EXCHANGES.indexOf(shortExch);
+  const longMax = LEV_DATA[coin][li];
+  const shortMax = LEV_DATA[coin][si];
+
   summary.innerHTML = [
     ['Total Capital (2 exchanges)', fmtK(totalCapital)],
-    ['Margin Used (each leg)', fmtK(longMargin)],
-    ['Long Position Size', fmtK(longPos)],
-    ['Short Position Size', fmtK(shortPos)],
-    ['Long Liq Price Move', (longLiqPct * 100).toFixed(1) + '%'],
-    ['Short Liq Price Move', '+' + (shortLiqPct * 100).toFixed(1) + '%'],
-    ['Idle Capital (each exch)', fmtK(capital - longMargin)],
+    ['Margin Used (each leg)', fmtK(margin)],
+    ['Position Size (each leg)', fmtK(posSize)],
+    [`Leverage (min of ${longExch} ${longMax}x, ${shortExch} ${shortMax}x)`, lev + 'x'],
+    ['Long Liq Price Move', '-' + (liqPct * 100).toFixed(1) + '%'],
+    ['Short Liq Price Move', '+' + (liqPct * 100).toFixed(1) + '%'],
+    ['Idle Capital (each exch)', fmtK(capital - margin)],
   ].map(([label, value]) =>
     `<div class="summary-card"><div class="label">${label}</div><div class="value">${value}</div></div>`
   ).join('');
@@ -284,7 +294,6 @@ function compute() {
   const moves = [];
   for (let m = -80; m <= 500; m += 5) moves.push(m);
 
-  // Build table: columns = Price Move | Long P&L | Short P&L | Combined | Long Margin Left | Short Margin Left | Combined ROI
   const phead = document.getElementById('pnl-head');
   const pbody = document.getElementById('pnl-body');
   phead.innerHTML = '<tr>' +
@@ -295,17 +304,16 @@ function compute() {
 
   pbody.innerHTML = moves.map(m => {
     const pct = m / 100;
-    const longPnl = longPos * pct;
-    const shortPnl = shortPos * (-pct);
+    const longPnl = posSize * pct;
+    const shortPnl = posSize * (-pct);
 
-    const longRemaining = longMargin + longPnl;
-    const shortRemaining = shortMargin + shortPnl;
+    const longRemaining = margin + longPnl;
+    const shortRemaining = margin + shortPnl;
     const longLiq = longRemaining <= 0;
     const shortLiq = shortRemaining <= 0;
 
-    // If liquidated, loss is capped at margin
-    const effLongPnl = longLiq ? -longMargin : longPnl;
-    const effShortPnl = shortLiq ? -shortMargin : shortPnl;
+    const effLongPnl = longLiq ? -margin : longPnl;
+    const effShortPnl = shortLiq ? -margin : shortPnl;
     const combined = effLongPnl + effShortPnl;
     const roi = combined / totalCapital * 100;
 
@@ -322,7 +330,6 @@ function compute() {
 
     const roiCls = roi >= 0 ? 'pos' : 'neg';
     const roiPrefix = roi >= 0 ? '+' : '';
-
     const highlight = m === 0 ? ' style="background:#e8e8e4"' : '';
     return `<tr${highlight}>` +
       `<td class="move-col">${m >= 0 ? '+' : ''}${m}%</td>` +
@@ -336,28 +343,70 @@ function compute() {
   }).join('');
 }
 
-// --- Wire up events ---
 [coinSel, longExchSel, shortExchSel].forEach(el => {
   el.addEventListener('change', () => { updateLevOptions(); compute(); });
 });
-[longLevSel, shortLevSel, capitalIn, deployIn].forEach(el => {
+[levSel, capitalIn, deployIn].forEach(el => {
   el.addEventListener('change', compute);
   el.addEventListener('input', compute);
 });
 
-document.getElementById('lev-toggle').addEventListener('click', () => {
-  const sec = document.getElementById('lev-section');
-  const link = document.getElementById('lev-toggle');
-  sec.classList.toggle('show');
-  link.textContent = sec.classList.contains('show')
-    ? 'Hide leverage table'
-    : 'Show leverage table (60 coins × 6 exchanges)';
-});
-
-// --- Init ---
-buildLevTable();
 updateLevOptions();
 compute();
+
+// ===================== PAGE 2: LEVERAGE TABLE =====================
+const levSortSel = document.getElementById('lev-sort');
+// Add sort options for each exchange
+EXCHANGES.forEach(e => {
+  levSortSel.add(new Option(`${e} (${EXCH_NAMES[e]}) desc`, e));
+});
+let levSortCol = 'coin';
+let levSortDir = -1; // -1 = desc for numbers, 1 = asc for coin name
+
+function buildLevTable() {
+  const sortBy = levSortSel.value;
+  const sortIdx = EXCHANGES.indexOf(sortBy);
+
+  // Sort coins
+  const sorted = [...COINS];
+  if (sortIdx >= 0) {
+    sorted.sort((a, b) => LEV_DATA[b][sortIdx] - LEV_DATA[a][sortIdx] || a.localeCompare(b));
+  } else {
+    sorted.sort((a, b) => a.localeCompare(b));
+  }
+
+  const head = document.getElementById('lev-head');
+  const body = document.getElementById('lev-body');
+  head.innerHTML = '<tr><th style="position:sticky;left:0;z-index:3">Coin</th>' +
+    EXCHANGES.map(e => {
+      const arrow = sortBy === e ? ' ▼' : '';
+      return `<th class="sortable" data-exch="${e}">${e}${arrow}</th>`;
+    }).join('') + '</tr>';
+
+  body.innerHTML = sorted.map(coin => {
+    const levs = LEV_DATA[coin];
+    const maxL = Math.max(...levs);
+    const minL = Math.min(...levs);
+    return '<tr><td class="coin">' + coin + '</td>' +
+      levs.map(l => {
+        let cls = '';
+        if (l === maxL) cls = ' class="lev-max"';
+        else if (l === minL) cls = ' class="lev-min"';
+        return `<td${cls}>${l}x</td>`;
+      }).join('') + '</tr>';
+  }).join('');
+
+  // Click-to-sort on headers
+  document.querySelectorAll('#lev-head th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      levSortSel.value = th.dataset.exch;
+      buildLevTable();
+    });
+  });
+}
+
+levSortSel.addEventListener('change', buildLevTable);
+buildLevTable();
 </script>
 </body>
 </html>
