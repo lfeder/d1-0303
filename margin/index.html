@@ -264,7 +264,10 @@ function compute() {
 
   const margin = capital * deployPct;
   const posSize = margin * lev;
-  const liqPct = 1 / lev;
+  // Liquidation uses full account balance (margin + idle), not just margin
+  // Long liq: capital + posSize * pct = 0 → pct = -capital/posSize
+  // Short liq: capital - posSize * pct = 0 → pct = capital/posSize
+  const liqPct = capital / posSize;
 
   const summary = document.getElementById('summary');
   const totalCapital = capital * 2;
@@ -281,11 +284,11 @@ function compute() {
   summary.innerHTML = [
     ['Total Capital (2 exchanges)', fmtK(totalCapital)],
     ['Margin Used (each leg)', fmtK(margin)],
+    ['Idle Capital (each exch)', fmtK(capital - margin)],
     ['Position Size (each leg)', fmtK(posSize)],
     [`Leverage (min of ${longExch} ${longMax}x, ${shortExch} ${shortMax}x)`, lev + 'x'],
     ['Long Liq Price Move', '-' + (liqPct * 100).toFixed(1) + '%'],
     ['Short Liq Price Move', '+' + (liqPct * 100).toFixed(1) + '%'],
-    ['Idle Capital (each exch)', fmtK(capital - margin)],
   ].map(([label, value]) =>
     `<div class="summary-card"><div class="label">${label}</div><div class="value">${value}</div></div>`
   ).join('');
@@ -299,7 +302,7 @@ function compute() {
   phead.innerHTML = '<tr>' +
     '<th style="position:sticky;left:0;z-index:3">Price Δ</th>' +
     '<th>Long P&L</th><th>Short P&L</th><th>Combined</th>' +
-    '<th>Long Margin</th><th>Short Margin</th>' +
+    '<th>Long Equity</th><th>Short Equity</th>' +
     '<th>ROI on Capital</th></tr>';
 
   pbody.innerHTML = moves.map(m => {
@@ -307,13 +310,15 @@ function compute() {
     const longPnl = posSize * pct;
     const shortPnl = posSize * (-pct);
 
-    const longRemaining = margin + longPnl;
-    const shortRemaining = margin + shortPnl;
-    const longLiq = longRemaining <= 0;
-    const shortLiq = shortRemaining <= 0;
+    // Account equity = full capital + P&L (idle capital absorbs losses)
+    const longEquity = capital + longPnl;
+    const shortEquity = capital + shortPnl;
+    const longLiq = longEquity <= 0;
+    const shortLiq = shortEquity <= 0;
 
-    const effLongPnl = longLiq ? -margin : longPnl;
-    const effShortPnl = shortLiq ? -margin : shortPnl;
+    // If liquidated, loss is capped at full account balance
+    const effLongPnl = longLiq ? -capital : longPnl;
+    const effShortPnl = shortLiq ? -capital : shortPnl;
     const combined = effLongPnl + effShortPnl;
     const roi = combined / totalCapital * 100;
 
@@ -336,8 +341,8 @@ function compute() {
       fmt(effLongPnl, longLiq) +
       fmt(effShortPnl, shortLiq) +
       fmt(combined, false) +
-      fmtMargin(Math.max(0, longRemaining), longLiq) +
-      fmtMargin(Math.max(0, shortRemaining), shortLiq) +
+      fmtMargin(Math.max(0, longEquity), longLiq) +
+      fmtMargin(Math.max(0, shortEquity), shortLiq) +
       `<td class="${roiCls}">${roiPrefix}${roi.toFixed(1)}%</td>` +
       '</tr>';
   }).join('');
