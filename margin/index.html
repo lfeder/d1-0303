@@ -70,9 +70,6 @@
   .summary-card .value { font-size: 14px; font-weight: bold; margin-top: 2px; }
 
   /* Leverage page */
-  .lev-controls { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 12px;
-    background: #e8e8e4; padding: 10px 14px; border-radius: 6px; border: 1px solid #ccc; }
-  .sort-arrow { font-size: 9px; margin-left: 2px; }
   .lev-min { background: #fce4e4; }
   .lev-max { background: #d4f0d4; }
 </style>
@@ -129,15 +126,7 @@
 
 <!-- PAGE 2: Leverage Table -->
 <div class="page" id="page-lev">
-  <p class="sub">Max leverage by coin &amp; exchange, sorted descending. Actual limits depend on position size and account level.</p>
-  <div class="lev-controls">
-    <div class="field">
-      <label>Sort by</label>
-      <select id="lev-sort">
-        <option value="coin">Coin (A-Z)</option>
-      </select>
-    </div>
-  </div>
+  <p class="sub">Max leverage by coin &amp; exchange. Click any column header to sort. Actual limits depend on position size and account level.</p>
   <div class="wrap" style="max-height:75vh">
     <table id="lev-table">
       <thead id="lev-head"></thead>
@@ -359,33 +348,29 @@ function compute() {
 compute();
 
 // ===================== PAGE 2: LEVERAGE TABLE =====================
-const levSortSel = document.getElementById('lev-sort');
-// Add sort options for each exchange
-EXCHANGES.forEach(e => {
-  levSortSel.add(new Option(`${e} (${EXCH_NAMES[e]}) desc`, e));
-});
-let levSortCol = 'coin';
-let levSortDir = -1; // -1 = desc for numbers, 1 = asc for coin name
+let levSortKey = 'coin';
+let levSortAsc = true;
 
 function buildLevTable() {
-  const sortBy = levSortSel.value;
-  const sortIdx = EXCHANGES.indexOf(sortBy);
-
-  // Sort coins
   const sorted = [...COINS];
-  if (sortIdx >= 0) {
-    sorted.sort((a, b) => LEV_DATA[b][sortIdx] - LEV_DATA[a][sortIdx] || a.localeCompare(b));
+  if (levSortKey === 'coin') {
+    sorted.sort((a, b) => levSortAsc ? a.localeCompare(b) : b.localeCompare(a));
   } else {
-    sorted.sort((a, b) => a.localeCompare(b));
+    const idx = EXCHANGES.indexOf(levSortKey);
+    sorted.sort((a, b) => {
+      const diff = levSortAsc ? LEV_DATA[a][idx] - LEV_DATA[b][idx] : LEV_DATA[b][idx] - LEV_DATA[a][idx];
+      return diff || a.localeCompare(b);
+    });
   }
 
+  const arrow = k => levSortKey === k ? (levSortAsc ? ' ▲' : ' ▼') : '';
   const head = document.getElementById('lev-head');
   const body = document.getElementById('lev-body');
-  head.innerHTML = '<tr><th style="position:sticky;left:0;z-index:3">Coin</th>' +
-    EXCHANGES.map(e => {
-      const arrow = sortBy === e ? ' ▼' : '';
-      return `<th class="sortable" data-exch="${e}">${e}${arrow}</th>`;
-    }).join('') + '</tr>';
+  head.innerHTML = '<tr>' +
+    `<th class="sortable" data-col="coin" style="position:sticky;left:0;z-index:3">Coin${arrow('coin')}</th>` +
+    EXCHANGES.map(e =>
+      `<th class="sortable" data-col="${e}">${e}${arrow(e)}</th>`
+    ).join('') + '</tr>';
 
   body.innerHTML = sorted.map(coin => {
     const levs = LEV_DATA[coin];
@@ -400,16 +385,16 @@ function buildLevTable() {
       }).join('') + '</tr>';
   }).join('');
 
-  // Click-to-sort on headers
   document.querySelectorAll('#lev-head th.sortable').forEach(th => {
     th.addEventListener('click', () => {
-      levSortSel.value = th.dataset.exch;
+      const col = th.dataset.col;
+      if (levSortKey === col) { levSortAsc = !levSortAsc; }
+      else { levSortKey = col; levSortAsc = col === 'coin'; }
       buildLevTable();
     });
   });
 }
 
-levSortSel.addEventListener('change', buildLevTable);
 buildLevTable();
 </script>
 </body>
