@@ -80,6 +80,7 @@
 <div class="tabs">
   <div class="tab active" data-page="page-sim">Margin Simulator</div>
   <div class="tab" data-page="page-lev">Leverage Table</div>
+  <div class="tab" data-page="page-moves">Max Moves</div>
 </div>
 
 <!-- PAGE 1: Margin Simulator -->
@@ -131,6 +132,17 @@
     <table id="lev-table">
       <thead id="lev-head"></thead>
       <tbody id="lev-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PAGE 3: Max Moves -->
+<div class="page" id="page-moves">
+  <p class="sub">Max absolute price move (%) per coin across all exchanges, by time window. Data: Jan 23 – Feb 25 2026, 1-min snapshots. Click any column to sort.</p>
+  <div class="wrap" style="max-height:80vh">
+    <table id="moves-table">
+      <thead id="moves-head"></thead>
+      <tbody id="moves-body"></tbody>
     </table>
   </div>
 </div>
@@ -396,6 +408,68 @@ function buildLevTable() {
 }
 
 buildLevTable();
+
+// ===================== PAGE 3: MAX MOVES TABLE =====================
+const WIN_LABELS = ['1m','10m','30m','1h','2h','4h','8h','24h','120h'];
+let movesData = null;
+let movesSortKey = '24h';
+let movesSortAsc = false;
+
+function buildMovesTable() {
+  if (!movesData) return;
+  const coins = Object.keys(movesData);
+
+  const sorted = [...coins];
+  if (movesSortKey === 'coin') {
+    sorted.sort((a, b) => movesSortAsc ? a.localeCompare(b) : b.localeCompare(a));
+  } else {
+    sorted.sort((a, b) => {
+      const diff = movesSortAsc
+        ? movesData[a][movesSortKey] - movesData[b][movesSortKey]
+        : movesData[b][movesSortKey] - movesData[a][movesSortKey];
+      return diff || a.localeCompare(b);
+    });
+  }
+
+  const arrow = k => movesSortKey === k ? (movesSortAsc ? ' ▲' : ' ▼') : '';
+  const head = document.getElementById('moves-head');
+  const body = document.getElementById('moves-body');
+  head.innerHTML = '<tr>' +
+    `<th class="sortable" data-col="coin" style="position:sticky;left:0;z-index:3">Coin${arrow('coin')}</th>` +
+    WIN_LABELS.map(w =>
+      `<th class="sortable" data-col="${w}">${w}${arrow(w)}</th>`
+    ).join('') + '</tr>';
+
+  body.innerHTML = sorted.map(coin => {
+    const d = movesData[coin];
+    const vals = WIN_LABELS.map(w => d[w]);
+    const maxV = Math.max(...vals);
+    const minV = Math.min(...vals);
+    return '<tr><td class="coin">' + coin + '</td>' +
+      WIN_LABELS.map(w => {
+        const v = d[w];
+        let cls = '';
+        if (v >= 50) cls = ' class="liq"';
+        else if (v >= 20) cls = ' class="neg"';
+        else if (v < 10) cls = ' class="pos"';
+        return `<td${cls}>${v.toFixed(1)}%</td>`;
+      }).join('') + '</tr>';
+  }).join('');
+
+  document.querySelectorAll('#moves-head th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (movesSortKey === col) { movesSortAsc = !movesSortAsc; }
+      else { movesSortKey = col; movesSortAsc = col === 'coin'; }
+      buildMovesTable();
+    });
+  });
+}
+
+fetch('moves.json')
+  .then(r => r.json())
+  .then(d => { movesData = d; buildMovesTable(); })
+  .catch(e => console.warn('moves.json not loaded:', e));
 </script>
 </body>
 </html>
