@@ -96,7 +96,7 @@
 <body>
 
 <h2>Basis Trade Viewer</h2>
-<p class="sub">Cross-exchange basis trade backtest — Jan 23 to Feb 25, 2026</p>
+<p class="sub">Cross-exchange basis trade backtest — Jan 23 to Feb 25, 2026 · v13-03 <!-- version stamp --></p>
 
 <div class="controls">
   <div class="ctrl-group">
@@ -119,8 +119,8 @@
   <div class="ctrl-group">
     <span class="ctrl-label">Exchanges:</span>
     <div class="toggle-group" id="tg-exch">
-      <button class="toggle-btn active" data-val="all">All</button>
-      <button class="toggle-btn" data-val="dex">DEX only</button>
+      <button class="toggle-btn active" data-val="cex">CEX</button>
+      <button class="toggle-btn active" data-val="dex">DEX</button>
     </div>
   </div>
   <div class="ctrl-group">
@@ -164,7 +164,7 @@
 
 <script>
 let DATA = null;
-let currentParams = { entry: 50, exit: 10, size: 10, exch: "all", maxpos: "10", filter1bar: true };
+let currentParams = { entry: 50, exit: 10, size: 10, cex: true, dex: true, maxpos: "10", filter1bar: true };
 
 async function loadData() {
   const resp = await fetch("basis.json");
@@ -193,9 +193,24 @@ function initControls() {
   selExit.addEventListener("change", () => { currentParams.exit = +selExit.value; render(); });
 
   setupToggle("tg-size", "size", v => +v);
-  setupToggle("tg-exch", "exch", v => v);
+  setupExchToggle();
   setupToggle("tg-maxpos", "maxpos", v => v);
   setupToggle("tg-1bar", "filter1bar", v => v === "on");
+}
+
+function setupExchToggle() {
+  const wrap = document.getElementById("tg-exch");
+  wrap.querySelectorAll(".toggle-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.val; // "cex" or "dex"
+      const other = key === "cex" ? "dex" : "cex";
+      // Don't allow both off — if turning off the last one, turn it back on
+      if (btn.classList.contains("active") && !currentParams[other]) return;
+      btn.classList.toggle("active");
+      currentParams[key] = btn.classList.contains("active");
+      render();
+    });
+  });
 }
 
 function setupToggle(id, param, parse) {
@@ -210,13 +225,24 @@ function setupToggle(id, param, parse) {
   });
 }
 
+const CEX_EXCHS = new Set(["BN", "BY", "OK"]);
+
 function getKey() {
-  return `${currentParams.size}k_${currentParams.exch}_e${currentParams.entry}_x${currentParams.exit}_m${currentParams.maxpos}`;
+  const exchKey = currentParams.cex ? "all" : "dex";
+  return `${currentParams.size}k_${exchKey}_e${currentParams.entry}_x${currentParams.exit}_m${currentParams.maxpos}`;
 }
 
 function render() {
   const key = getKey();
   let trades = DATA.results[key] || [];
+
+  // CEX-only filter: keep only pairs where both exchanges are CEX
+  if (currentParams.cex && !currentParams.dex) {
+    trades = trades.filter(t => {
+      const [a, b] = t.pair.split("/");
+      return CEX_EXCHS.has(a) && CEX_EXCHS.has(b);
+    });
+  }
 
   // Apply 1-bar filter: remove closed trades with duration <= 1 min
   if (currentParams.filter1bar) {
