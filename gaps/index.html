@@ -120,7 +120,7 @@
 </head>
 <body>
 
-<div style="font-size:10px;font-family:monospace;color:#222;margin-bottom:4px">v03-24 20:30</div>
+<div style="font-size:10px;font-family:monospace;color:#222;margin-bottom:4px">v03-24 21:45</div>
 <h2>L2 Orderbook Gap Viewer</h2>
 <p class="sub">Coverage gaps in 1-minute L2 orderbook data (Dec 21 – Mar 20) &nbsp;|&nbsp; click an exchange to see per-coin details below</p>
 
@@ -128,6 +128,7 @@
   <div class="legend-item"><div class="legend-swatch" style="background:#d4e6d4"></div> Data present</div>
   <div class="legend-item"><div class="legend-swatch" style="background:#c0392b"></div> Gap (missing data)</div>
   <div class="legend-item"><div class="legend-swatch" style="background:#bbb"></div> Before first / after last tick</div>
+  <button id="btn-filter60" onclick="toggleFilter60()" style="margin-left:16px;padding:2px 8px;font-size:10px;font-family:monospace;cursor:pointer">Show 60 only</button>
 </div>
 
 <div id="exch-summary"></div>
@@ -140,6 +141,23 @@
 let GAP_DATA = null;
 const exchSort = {};
 let selectedExch = null;
+let filter60 = false;
+
+const COINS_60 = new Set([
+  'AAVE','ADA','AERO','APT','ARB','AVAX','BCH','BERA','BNB','BTC',
+  'CRV','DOGE','DOT','DYDX','EIGEN','ENA','ETH','ETHFI','FARTCOIN','FIL',
+  'GRASS','HBAR','HYPE','ICP','IP','JTO','JUP','KAITO','LDO','LINK',
+  'LTC','MNT','MORPHO','NEAR','OP','ONDO','PAXG','PENDLE','PENGU','POL',
+  'POPCAT','PYTH','SEI','SOL','SPX','STRK','SUI','TAO','TIA','TON',
+  'TRUMP','UNI','VIRTUAL','WIF','WLD','XLM','XMR','XRP','ZRO','JTO'
+]);
+
+function toggleFilter60() {
+  filter60 = !filter60;
+  document.getElementById('btn-filter60').textContent = filter60 ? 'Show all' : 'Show 60 only';
+  render();
+  if (selectedExch) selectExch(selectedExch);
+}
 
 const ABBREV = {
   Aster: 'AS', Binance: 'BN', Bybit: 'BY',
@@ -204,7 +222,7 @@ function mergeIntervals(intervals, globalSpan) {
 
 function getExchSummary(exch) {
   const exchData = GAP_DATA.gaps[exch];
-  const coins = Object.keys(exchData);
+  const coins = Object.keys(exchData).filter(c => !filter60 || COINS_60.has(c));
   const totalCoins = coins.length;
   const withGaps = coins.filter(c => exchData[c].missing_minutes > 0).length;
   const avgCov = coins.reduce((s, c) => s + exchData[c].coverage_pct, 0) / totalCoins;
@@ -278,8 +296,10 @@ function selectExch(exch) {
   const panel = document.getElementById('coin-detail');
   panel.classList.add('open');
   const abbr = ABBREV[exch] || exch;
-  const nCoins = Object.keys(GAP_DATA.gaps[exch]).length;
-  document.getElementById('coin-detail-header').textContent = `${exch} (${abbr}) \u2014 ${nCoins} coins`;
+  const allCoins = Object.keys(GAP_DATA.gaps[exch]);
+  const nCoins = filter60 ? allCoins.filter(c => COINS_60.has(c)).length : allCoins.length;
+  const filterLabel = filter60 ? ' (60 filter)' : '';
+  document.getElementById('coin-detail-header').textContent = `${exch} (${abbr}) \u2014 ${nCoins} coins${filterLabel}`;
   renderCoinDetail(document.getElementById('coin-detail-inner'), exch);
 }
 
@@ -334,7 +354,7 @@ function renderCoinDetail(container, exch) {
   if (!exchSort[exch]) exchSort[exch] = { col: 'coverage', asc: true };
   const st = exchSort[exch];
 
-  const coins = Object.keys(exchData).sort((a, b) => {
+  const coins = Object.keys(exchData).filter(c => !filter60 || COINS_60.has(c)).sort((a, b) => {
     let cmp;
     if (st.col === 'name') cmp = a.localeCompare(b);
     else cmp = exchData[a].coverage_pct - exchData[b].coverage_pct;
