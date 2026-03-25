@@ -58,7 +58,7 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 #loading { text-align: center; padding: 40px; color: #888; font-size: 13px; }
 
 @media print {
-  @page { size: landscape; margin: 3mm; }
+  @page { size: portrait; margin: 3mm; }
   body { padding: 0; }
   .toolbar, .legend, .bar-tip, #loading { display: none !important; }
   p.sub { display: none !important; }
@@ -72,7 +72,7 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
 <h2 style="font-size:14px">Daily Volume Viewer</h2>
-<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:39</div>
+<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:41</div>
 </div>
 <p class="sub">Daily perpetual-swap volume (quote USD) by exchange &amp; coin &nbsp;|&nbsp; Mar 2025 – Mar 2026</p>
 
@@ -222,8 +222,8 @@ function printPage() {
   const wrap = document.getElementById('printWrap');
   const contentH = wrap.scrollHeight;
   const contentW = wrap.scrollWidth;
-  // Landscape A4 printable area ~277mm x 190mm ≈ 1047px x 718px at 96dpi
-  const pageW = 1047, pageH = 718;
+  // Portrait A4 printable area ~200mm x 287mm ≈ 756px x 1085px at 96dpi
+  const pageW = 756, pageH = 1085;
   const scale = Math.min(pageW / contentW, pageH / contentH, 1);
   wrap.style.transform = `scale(${scale})`;
   wrap.style.width = (contentW) + 'px';
@@ -286,6 +286,7 @@ function render() {
       label: EXCH_ABBR[ex] || ex,
       vols: exchDaily[ex],
     }));
+    summaryRows.sort((a, b) => avgSlice(b.vols, start, end) - avgSlice(a.vols, start, end));
   } else {
     summaryRows = [];
     for (let rank = 1; rank <= 6; rank++) {
