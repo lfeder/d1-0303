@@ -63,7 +63,7 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
 <h2 style="font-size:14px">Daily Volume Viewer</h2>
-<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:46</div>
+<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 21:16</div>
 </div>
 <p class="sub">Daily perpetual-swap volume (quote USD) by exchange &amp; coin &nbsp;|&nbsp; Mar 2025 – Mar 2026</p>
 
@@ -284,7 +284,7 @@ function savePng() {
     const bg = i % 2 ? '#f0f0eb' : '#fafaf5';
     ctx.fillStyle = bg; ctx.fillRect(0, y, LEFT, ROW_H);
     ctx.fillStyle = '#999'; ctx.fillText(String(i + 1), 4, y + 8);
-    ctx.fillStyle = '#666'; ctx.fillText(EXCH_ABBR[r.ex] || r.ex, COL_NUM + 2, y + 8);
+    if (r.ex) { ctx.fillStyle = '#666'; ctx.fillText(EXCH_ABBR[r.ex] || r.ex, COL_NUM + 2, y + 8); }
     ctx.fillStyle = '#222'; ctx.font = 'bold 9px monospace';
     ctx.fillText(r.symbol, COL_NUM + COL_EX + 2, y + 8);
     ctx.font = '9px monospace';
@@ -311,17 +311,20 @@ function render() {
   const visibleDates = dates.slice(start, end);
   const nVis = visibleDates.length;
 
-  // Rank each coin's exchanges by full-period avg (stable ranking)
-  // Cache rankings
-  if (!DATA._ranks) {
-    DATA._ranks = {};
+  // Cache per-day ranked vols: for each coin, for each day, sort exchange vols desc
+  if (!DATA._dailyRanks) {
+    DATA._dailyRanks = {};
     for (const coin of coins) {
+      const exKeys = Object.keys(coin.e);
+      const nEx = exKeys.length;
       const ranked = [];
-      for (const e of Object.keys(coin.e)) {
-        ranked.push({ e, avg: avgSlice(coin.e[e], 0, totalN) });
+      for (let r = 0; r < nEx; r++) ranked.push(new Array(totalN).fill(0));
+      for (let d = 0; d < totalN; d++) {
+        const dayVols = exKeys.map(e => coin.e[e][d] || 0);
+        dayVols.sort((a, b) => b - a);
+        for (let r = 0; r < nEx; r++) ranked[r][d] = dayVols[r];
       }
-      ranked.sort((a, b) => b.avg - a.avg);
-      DATA._ranks[coin.s] = ranked;
+      DATA._dailyRanks[coin.s] = ranked;
     }
   }
 
@@ -334,11 +337,11 @@ function render() {
       ex = exchFilter;
       vols = coin.e[exchFilter];
     } else {
-      const ranked = DATA._ranks[coin.s];
-      const idx = parseInt(rankFilter) - 1;
-      if (idx >= ranked.length) continue;
-      ex = ranked[idx].e;
-      vols = coin.e[ex];
+      const dr = DATA._dailyRanks[coin.s];
+      const rankIdx = parseInt(rankFilter) - 1;
+      if (rankIdx >= dr.length) continue;
+      vols = dr[rankIdx];
+      ex = null; // varies per day
     }
     const avg = avgSlice(vols, start, end);
     rows.push({ symbol: coin.s, ex, vols, avg });
@@ -346,8 +349,6 @@ function render() {
   rows.sort((a, b) => b.avg - a.avg);
 
   // Summary bars: always 6 rows
-  // Exchange mode: one row per exchange total
-  // Rank mode: one row per rank (#1-#6), each = aggregated daily vol for that rank
   let summaryRows;
   if (exchFilter) {
     summaryRows = exchanges.map(ex => ({
@@ -360,11 +361,10 @@ function render() {
     for (let rank = 1; rank <= 6; rank++) {
       const rankVols = new Array(totalN).fill(0);
       for (const coin of coins) {
-        const ranked = DATA._ranks[coin.s];
-        if (rank > ranked.length) continue;
-        const ex = ranked[rank - 1].e;
-        const vols = coin.e[ex];
-        for (let i = 0; i < totalN; i++) rankVols[i] += (vols[i] || 0);
+        const dr = DATA._dailyRanks[coin.s];
+        if (rank > dr.length) continue;
+        const cv = dr[rank - 1];
+        for (let i = 0; i < totalN; i++) rankVols[i] += cv[i];
       }
       summaryRows.push({ label: `#${rank}`, vols: rankVols });
     }
@@ -417,7 +417,8 @@ function render() {
   for (let ri = 0; ri < rows.length; ri++) { const r = rows[ri];
     const row = document.createElement('div');
     row.className = 'vol-row';
-    row.innerHTML = `<div class="col-num">${ri + 1}</div><div class="col-exch">${EXCH_ABBR[r.ex] || r.ex}</div><div class="col-sym" title="${r.symbol}">${r.symbol}</div><div class="col-avg" title="${fmtFull(r.avg)}/day">${fmtVol(r.avg)}</div><div class="col-bar"><canvas style="image-rendering:pixelated"></canvas></div>`;
+    const exLabel = r.ex ? (EXCH_ABBR[r.ex] || r.ex) : '';
+    row.innerHTML = `<div class="col-num">${ri + 1}</div><div class="col-exch">${exLabel}</div><div class="col-sym" title="${r.symbol}">${r.symbol}</div><div class="col-avg" title="${fmtFull(r.avg)}/day">${fmtVol(r.avg)}</div><div class="col-bar"><canvas style="image-rendering:pixelated"></canvas></div>`;
     container.appendChild(row);
     paintBar(row.querySelector('canvas'), r.vols, start, end);
     const barDiv = row.querySelector('.col-bar');
