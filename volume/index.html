@@ -63,7 +63,7 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
 <h2 style="font-size:14px">Daily Volume Viewer</h2>
-<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 21:16</div>
+<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 21:52</div>
 </div>
 <p class="sub">Daily perpetual-swap volume (quote USD) by exchange &amp; coin &nbsp;|&nbsp; Mar 2025 – Mar 2026</p>
 
@@ -82,6 +82,11 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
   <button class="exch-btn" data-ex="hyperliquid" onclick="setExch('hyperliquid')">HL</button>
   <button class="exch-btn" data-ex="aster" onclick="setExch('aster')">AS</button>
   <button class="exch-btn" data-ex="lighter" onclick="setExch('lighter')">LT</button>
+  <div class="sep"></div>
+  <span class="label">Venue:</span>
+  <button class="venue-btn active" data-venue="all" onclick="setVenue('all')">All</button>
+  <button class="venue-btn" data-venue="cex" onclick="setVenue('cex')">CEX</button>
+  <button class="venue-btn" data-venue="dex" onclick="setVenue('dex')">DEX</button>
   <div class="sep"></div>
   <span class="label">Period:</span>
   <button class="range-btn" data-range="30" onclick="setRange(30)">30d</button>
@@ -119,8 +124,11 @@ let DATA = null;
 let rankFilter = '2';
 let exchFilter = null;
 let dateRange = 0; // 0 = all
+let venueFilter = 'all'; // 'all', 'dex', 'cex'
 
 const EXCH_ABBR = { binance: 'BN', bybit: 'BB', okx: 'OKX', hyperliquid: 'HL', aster: 'AS', lighter: 'LT' };
+const DEX_SET = new Set(['hyperliquid', 'aster', 'lighter']);
+const CEX_SET = new Set(['binance', 'bybit', 'okx']);
 
 function fmtVol(v) {
   if (!v) return '';
@@ -167,6 +175,20 @@ function setRange(days) {
   dateRange = days;
   document.querySelectorAll('.range-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.range) === days));
   render();
+}
+function setVenue(v) {
+  venueFilter = v;
+  exchFilter = null; // back to rank mode
+  document.querySelectorAll('.venue-btn').forEach(b => b.classList.toggle('active', b.dataset.venue === v));
+  document.querySelectorAll('.exch-btn').forEach(b => b.classList.remove('active-exch'));
+  if (!rankFilter) { rankFilter = '2'; document.querySelector('.rank-btn[data-rank="2"]').classList.add('active'); }
+  DATA._dailyRanks = null; // invalidate cache
+  render();
+}
+function getExchSet() {
+  if (venueFilter === 'dex') return DEX_SET;
+  if (venueFilter === 'cex') return CEX_SET;
+  return null; // all
 }
 
 function avgSlice(vols, start, end) {
@@ -311,12 +333,14 @@ function render() {
   const visibleDates = dates.slice(start, end);
   const nVis = visibleDates.length;
 
-  // Cache per-day ranked vols: for each coin, for each day, sort exchange vols desc
+  // Cache per-day ranked vols, filtered by venue
+  const exchSet = getExchSet();
   if (!DATA._dailyRanks) {
     DATA._dailyRanks = {};
     for (const coin of coins) {
-      const exKeys = Object.keys(coin.e);
+      const exKeys = Object.keys(coin.e).filter(e => !exchSet || exchSet.has(e));
       const nEx = exKeys.length;
+      if (!nEx) { DATA._dailyRanks[coin.s] = []; continue; }
       const ranked = [];
       for (let r = 0; r < nEx; r++) ranked.push(new Array(totalN).fill(0));
       for (let d = 0; d < totalN; d++) {
@@ -348,8 +372,10 @@ function render() {
   }
   rows.sort((a, b) => b.avg - a.avg);
 
-  // Summary bars: always 6 rows
+  // Summary bars
   let summaryRows;
+  const filteredExchanges = exchSet ? exchanges.filter(e => exchSet.has(e)) : exchanges;
+  const maxRanks = filteredExchanges.length;
   if (exchFilter) {
     summaryRows = exchanges.map(ex => ({
       label: EXCH_ABBR[ex] || ex,
@@ -358,7 +384,7 @@ function render() {
     summaryRows.sort((a, b) => avgSlice(b.vols, start, end) - avgSlice(a.vols, start, end));
   } else {
     summaryRows = [];
-    for (let rank = 1; rank <= 6; rank++) {
+    for (let rank = 1; rank <= maxRanks; rank++) {
       const rankVols = new Array(totalN).fill(0);
       for (const coin of coins) {
         const dr = DATA._dailyRanks[coin.s];
@@ -370,7 +396,8 @@ function render() {
     }
   }
 
-  const mode = exchFilter ? (EXCH_ABBR[exchFilter] || exchFilter) : `rank #${rankFilter}`;
+  const venueLabel = venueFilter !== 'all' ? ` (${venueFilter.toUpperCase()})` : '';
+  const mode = exchFilter ? (EXCH_ABBR[exchFilter] || exchFilter) : `rank #${rankFilter}${venueLabel}`;
   document.getElementById('status').textContent = `${rows.length} coins · ${mode} · ${nVis}d`;
 
   // Store for PNG export
