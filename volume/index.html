@@ -60,7 +60,7 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
 <h2 style="font-size:14px">Daily Volume Viewer</h2>
-<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:18</div>
+<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:24</div>
 </div>
 <p class="sub">Daily perpetual-swap volume (quote USD) by exchange &amp; coin &nbsp;|&nbsp; Mar 2025 – Mar 2026</p>
 
@@ -238,8 +238,9 @@ function render() {
   }
   rows.sort((a, b) => b.avg - a.avg);
 
-  // Summary bars: in rank mode, aggregate the rank-N exchange volume per day
-  // In exchange mode, show per-exchange totals as before
+  // Summary bars: always 6 rows
+  // Exchange mode: one row per exchange total
+  // Rank mode: one row per rank (#1-#6), each = aggregated daily vol for that rank
   let summaryRows;
   if (exchFilter) {
     summaryRows = exchanges.map(ex => ({
@@ -247,15 +248,18 @@ function render() {
       vols: exchDaily[ex],
     }));
   } else {
-    // Build daily total for the selected rank across all coins
-    const rankVols = new Array(totalN).fill(0);
-    for (const r of rows) {
-      for (let i = 0; i < totalN; i++) rankVols[i] += (r.vols[i] || 0);
+    summaryRows = [];
+    for (let rank = 1; rank <= 6; rank++) {
+      const rankVols = new Array(totalN).fill(0);
+      for (const coin of coins) {
+        const ranked = DATA._ranks[coin.s];
+        if (rank > ranked.length) continue;
+        const ex = ranked[rank - 1].e;
+        const vols = coin.e[ex];
+        for (let i = 0; i < totalN; i++) rankVols[i] += (vols[i] || 0);
+      }
+      summaryRows.push({ label: `#${rank}`, vols: rankVols });
     }
-    summaryRows = [{
-      label: `#${rankFilter}`,
-      vols: rankVols,
-    }];
   }
 
   const mode = exchFilter ? (EXCH_ABBR[exchFilter] || exchFilter) : `rank #${rankFilter}`;
