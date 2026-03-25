@@ -43,9 +43,11 @@ for (sym, ex), grp in df.groupby(["base_symbol", "exchange"]):
         coin_exch[sym] = {}
     coin_exch[sym][ex] = to_array({r["date"]: r["vol"] for _, r in grp.iterrows()})
 
-# Build coins list sorted by total volume desc
+# Build coins list sorted by total volume desc (only coins on 2+ exchanges)
 coins = []
 for sym, exmap in coin_exch.items():
+    if len(exmap) < 2:
+        continue
     total = sum(sum(a) for a in exmap.values())
     coins.append({"s": sym, "t": int(total), "e": exmap})
 coins.sort(key=lambda c: c["t"], reverse=True)
