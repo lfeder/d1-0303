@@ -18,7 +18,14 @@ df = df[["exchange", "base_symbol", "date", "quote_volume_usd"]].copy()
 df.rename(columns={"quote_volume_usd": "vol"}, inplace=True)
 df = df.groupby(["exchange", "base_symbol", "date"], as_index=False)["vol"].sum()
 
-dates = sorted(df["date"].unique().tolist())
+# Drop partial first/last days
+all_dates = sorted(df["date"].unique().tolist())
+daily_total = df.groupby("date")["vol"].sum()
+median_vol = daily_total.median()
+# Drop days with < 20% of median (partial days)
+valid_dates = [d for d in all_dates if daily_total.get(d, 0) >= median_vol * 0.2]
+df = df[df["date"].isin(valid_dates)]
+dates = valid_dates
 date_idx = {d: i for i, d in enumerate(dates)}
 n = len(dates)
 exchanges = sorted(df["exchange"].unique().tolist())

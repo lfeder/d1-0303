@@ -60,7 +60,7 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
 <h2 style="font-size:14px">Daily Volume Viewer</h2>
-<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:02</div>
+<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:18</div>
 </div>
 <p class="sub">Daily perpetual-swap volume (quote USD) by exchange &amp; coin &nbsp;|&nbsp; Mar 2025 – Mar 2026</p>
 
@@ -80,6 +80,11 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
   <button class="exch-btn" data-ex="hyperliquid" onclick="setExch('hyperliquid')">HL</button>
   <button class="exch-btn" data-ex="aster" onclick="setExch('aster')">AS</button>
   <button class="exch-btn" data-ex="lighter" onclick="setExch('lighter')">LT</button>
+  <div class="sep"></div>
+  <span class="label">Period:</span>
+  <button class="range-btn" data-range="30" onclick="setRange(30)">30d</button>
+  <button class="range-btn" data-range="90" onclick="setRange(90)">90d</button>
+  <button class="range-btn active" data-range="0" onclick="setRange(0)">All</button>
   <div class="sep"></div>
   <span id="status" style="font-size:10px;color:#666"></span>
 </div>
@@ -108,6 +113,7 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 let DATA = null;
 let rankFilter = '1';
 let exchFilter = null;
+let dateRange = 0; // 0 = all
 
 const EXCH_ABBR = { binance: 'BN', bybit: 'BB', okx: 'OKX', hyperliquid: 'HL', aster: 'AS', lighter: 'LT' };
 
@@ -126,10 +132,10 @@ function fmtFull(v) {
 // Fixed threshold color: returns [r,g,b]
 function volRgb(v) {
   if (!v) return null;
-  if (v >= 1e8) return [26, 122, 26];    // >$100M dark green
-  if (v >= 1e7) return [124, 196, 124];   // $10-100M light green
-  if (v >= 1e6) return [220, 200, 80];    // $1-10M yellow
-  return [200, 100, 100];                  // <$1M red
+  if (v >= 1e8) return [26, 122, 26];
+  if (v >= 1e7) return [124, 196, 124];
+  if (v >= 1e6) return [220, 200, 80];
+  return [200, 100, 100];
 }
 
 function setRank(r) {
@@ -144,21 +150,26 @@ function setExch(ex) {
   document.querySelectorAll('.rank-btn').forEach(b => b.classList.remove('active'));
   render();
 }
-function avgVol(vols) {
+function setRange(days) {
+  dateRange = days;
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.range) === days));
+  render();
+}
+
+function avgSlice(vols, start, end) {
   let sum = 0, count = 0;
-  for (const v of vols) { if (v) { sum += v; count++; } }
+  for (let i = start; i < end; i++) { if (vols[i]) { sum += vols[i]; count++; } }
   return count ? sum / count : 0;
 }
 
-// Paint a canvas bar for a volume array
-function paintBar(canvas, vols) {
-  const n = vols.length;
-  canvas.width = n;
+function paintBar(canvas, vols, start, end) {
+  const len = end - start;
+  canvas.width = len;
   canvas.height = 1;
   const ctx = canvas.getContext('2d');
-  const img = ctx.createImageData(n, 1);
-  for (let i = 0; i < n; i++) {
-    const rgb = volRgb(vols[i]);
+  const img = ctx.createImageData(len, 1);
+  for (let i = 0; i < len; i++) {
+    const rgb = volRgb(vols[start + i]);
     const off = i * 4;
     if (rgb) {
       img.data[off] = rgb[0]; img.data[off+1] = rgb[1]; img.data[off+2] = rgb[2]; img.data[off+3] = 255;
@@ -169,14 +180,13 @@ function paintBar(canvas, vols) {
   ctx.putImageData(img, 0, 0);
 }
 
-// Tooltip on bar hover
 const tip = document.getElementById('tip');
-function barMove(e, dates, vols) {
+function barMove(e, visibleDates, vols, start) {
   const rect = e.target.getBoundingClientRect();
   const x = e.clientX - rect.left;
-  const idx = Math.floor(x / rect.width * dates.length);
-  if (idx < 0 || idx >= dates.length) { tip.style.display = 'none'; return; }
-  tip.textContent = `${dates[idx]}: ${fmtFull(vols[idx])}`;
+  const idx = Math.floor(x / rect.width * visibleDates.length);
+  if (idx < 0 || idx >= visibleDates.length) { tip.style.display = 'none'; return; }
+  tip.textContent = `${visibleDates[idx]}: ${fmtFull(vols[start + idx])}`;
   tip.style.display = 'block';
   tip.style.left = (e.clientX + 12) + 'px';
   tip.style.top = (e.clientY - 24) + 'px';
@@ -186,46 +196,81 @@ function barLeave() { tip.style.display = 'none'; }
 function render() {
   if (!DATA) return;
   const { dates, exchanges, exchDaily, coins } = DATA;
-  const n = dates.length;
+  const totalN = dates.length;
 
-  const filtered = coins;
+  // Date range slicing
+  const end = totalN;
+  const start = dateRange ? Math.max(0, end - dateRange) : 0;
+  const visibleDates = dates.slice(start, end);
+  const nVis = visibleDates.length;
+
+  // Rank each coin's exchanges by full-period avg (stable ranking)
+  // Cache rankings
+  if (!DATA._ranks) {
+    DATA._ranks = {};
+    for (const coin of coins) {
+      const ranked = [];
+      for (const e of Object.keys(coin.e)) {
+        ranked.push({ e, avg: avgSlice(coin.e[e], 0, totalN) });
+      }
+      ranked.sort((a, b) => b.avg - a.avg);
+      DATA._ranks[coin.s] = ranked;
+    }
+  }
 
   // Build one row per coin
   const rows = [];
-  for (const coin of filtered) {
+  for (const coin of coins) {
     let ex, vols;
     if (exchFilter) {
       if (!coin.e[exchFilter]) continue;
       ex = exchFilter;
       vols = coin.e[exchFilter];
     } else {
-      const ranked = [];
-      for (const e of Object.keys(coin.e)) {
-        ranked.push({ e, avg: avgVol(coin.e[e]) });
-      }
-      ranked.sort((a, b) => b.avg - a.avg);
+      const ranked = DATA._ranks[coin.s];
       const idx = parseInt(rankFilter) - 1;
       if (idx >= ranked.length) continue;
       ex = ranked[idx].e;
       vols = coin.e[ex];
     }
-    rows.push({ symbol: coin.s, ex, vols, avg: avgVol(vols) });
+    const avg = avgSlice(vols, start, end);
+    rows.push({ symbol: coin.s, ex, vols, avg });
   }
   rows.sort((a, b) => b.avg - a.avg);
 
+  // Summary bars: in rank mode, aggregate the rank-N exchange volume per day
+  // In exchange mode, show per-exchange totals as before
+  let summaryRows;
+  if (exchFilter) {
+    summaryRows = exchanges.map(ex => ({
+      label: EXCH_ABBR[ex] || ex,
+      vols: exchDaily[ex],
+    }));
+  } else {
+    // Build daily total for the selected rank across all coins
+    const rankVols = new Array(totalN).fill(0);
+    for (const r of rows) {
+      for (let i = 0; i < totalN; i++) rankVols[i] += (r.vols[i] || 0);
+    }
+    summaryRows = [{
+      label: `#${rankFilter}`,
+      vols: rankVols,
+    }];
+  }
+
   const mode = exchFilter ? (EXCH_ABBR[exchFilter] || exchFilter) : `rank #${rankFilter}`;
-  document.getElementById('status').textContent = `${rows.length} coins · ${mode}`;
+  document.getElementById('status').textContent = `${rows.length} coins · ${mode} · ${nVis}d`;
 
   // Date ticks
   const tickBar = document.getElementById('dateTickBar');
   tickBar.innerHTML = '';
-  const step = Math.max(1, Math.floor(n / 26));
-  for (let i = 0; i < n; i += step) {
-    const pct = (i / n * 100).toFixed(2);
+  const step = Math.max(1, Math.floor(nVis / 26));
+  for (let i = 0; i < nVis; i += step) {
+    const pct = (i / nVis * 100).toFixed(2);
     const tick = document.createElement('div');
     tick.className = 'date-tick';
     tick.style.left = pct + '%';
-    tick.textContent = dates[i].slice(5);
+    tick.textContent = visibleDates[i].slice(5);
     tickBar.appendChild(tick);
   }
 
@@ -233,22 +278,20 @@ function render() {
   const container = document.getElementById('rows');
   container.innerHTML = '';
 
-  // Exchange summary rows
-  for (const ex of exchanges) {
-    const vols = exchDaily[ex];
-    const avg = avgVol(vols);
+  // Summary rows
+  for (const sr of summaryRows) {
+    const avg = avgSlice(sr.vols, start, end);
     const row = document.createElement('div');
     row.className = 'vol-row exch-summary';
-    row.innerHTML = `<div class="col-exch">${EXCH_ABBR[ex] || ex}</div><div class="col-sym"></div><div class="col-avg" title="${fmtFull(avg)}/day">${fmtVol(avg)}</div><div class="col-bar"><canvas style="image-rendering:pixelated"></canvas></div>`;
+    row.innerHTML = `<div class="col-exch">${sr.label}</div><div class="col-sym"></div><div class="col-avg" title="${fmtFull(avg)}/day">${fmtVol(avg)}</div><div class="col-bar"><canvas style="image-rendering:pixelated"></canvas></div>`;
     container.appendChild(row);
-    const canvas = row.querySelector('canvas');
-    paintBar(canvas, vols);
+    paintBar(row.querySelector('canvas'), sr.vols, start, end);
     const barDiv = row.querySelector('.col-bar');
-    barDiv.addEventListener('mousemove', e => barMove(e, dates, vols));
+    barDiv.addEventListener('mousemove', e => barMove(e, visibleDates, sr.vols, start));
     barDiv.addEventListener('mouseleave', barLeave);
   }
 
-  // Section separator
+  // Separator
   const sep = document.createElement('div');
   sep.className = 'vol-row section-hdr';
   sep.innerHTML = `<div style="padding:0 4px">Coins</div>`;
@@ -260,10 +303,9 @@ function render() {
     row.className = 'vol-row';
     row.innerHTML = `<div class="col-exch">${EXCH_ABBR[r.ex] || r.ex}</div><div class="col-sym" title="${r.symbol}">${r.symbol}</div><div class="col-avg" title="${fmtFull(r.avg)}/day">${fmtVol(r.avg)}</div><div class="col-bar"><canvas style="image-rendering:pixelated"></canvas></div>`;
     container.appendChild(row);
-    const canvas = row.querySelector('canvas');
-    paintBar(canvas, r.vols);
+    paintBar(row.querySelector('canvas'), r.vols, start, end);
     const barDiv = row.querySelector('.col-bar');
-    barDiv.addEventListener('mousemove', e => barMove(e, dates, r.vols));
+    barDiv.addEventListener('mousemove', e => barMove(e, visibleDates, r.vols, start));
     barDiv.addEventListener('mouseleave', barLeave);
   }
 }
