@@ -56,20 +56,29 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 .bar-tip { display: none; position: fixed; background: #333; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 10px; white-space: nowrap; z-index: 100; pointer-events: none; font-family: monospace; }
 
 #loading { text-align: center; padding: 40px; color: #888; font-size: 13px; }
+
+@media print {
+  @page { size: landscape; margin: 3mm; }
+  body { padding: 0; }
+  .toolbar, .legend, .bar-tip, #loading { display: none !important; }
+  p.sub { display: none !important; }
+  .viewer { max-height: none !important; overflow: visible !important; }
+  .vol-row .col-bar canvas { image-rendering: pixelated; }
+  #printWrap { transform-origin: top left; }
+}
 </style>
 </head>
 <body>
 
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
 <h2 style="font-size:14px">Daily Volume Viewer</h2>
-<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:34</div>
+<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:39</div>
 </div>
 <p class="sub">Daily perpetual-swap volume (quote USD) by exchange &amp; coin &nbsp;|&nbsp; Mar 2025 – Mar 2026</p>
 
 <div class="toolbar">
   <span class="label">Rank:</span>
-  <button class="rank-btn active" data-rank="1" onclick="setRank('1')">#1</button>
-  <button class="rank-btn" data-rank="2" onclick="setRank('2')">#2</button>
+  <button class="rank-btn active" data-rank="2" onclick="setRank('2')">#2</button>
   <button class="rank-btn" data-rank="3" onclick="setRank('3')">#3</button>
   <button class="rank-btn" data-rank="4" onclick="setRank('4')">#4</button>
   <button class="rank-btn" data-rank="5" onclick="setRank('5')">#5</button>
@@ -89,6 +98,8 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
   <button class="range-btn active" data-range="0" onclick="setRange(0)">All</button>
   <div class="sep"></div>
   <span id="status" style="font-size:10px;color:#666"></span>
+  <div class="sep"></div>
+  <button onclick="printPage()" style="border-color:#888">Print</button>
 </div>
 
 <div class="legend">
@@ -100,6 +111,7 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 </div>
 
 <div id="loading">Loading volume.json…</div>
+<div id="printWrap">
 <div id="viewer" class="viewer" style="display:none">
   <div class="date-header" id="dateHeader">
     <div class="col-num">#</div>
@@ -110,11 +122,12 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
   </div>
   <div id="rows"></div>
 </div>
+</div><!-- printWrap -->
 <div class="bar-tip" id="tip"></div>
 
 <script>
 let DATA = null;
-let rankFilter = '1';
+let rankFilter = '2';
 let exchFilter = null;
 let dateRange = 0; // 0 = all
 
@@ -204,6 +217,20 @@ function barMove(e, visibleDates, vols, start) {
   tip.style.top = (e.clientY - 24) + 'px';
 }
 function barLeave() { tip.style.display = 'none'; }
+
+function printPage() {
+  const wrap = document.getElementById('printWrap');
+  const contentH = wrap.scrollHeight;
+  const contentW = wrap.scrollWidth;
+  // Landscape A4 printable area ~277mm x 190mm ≈ 1047px x 718px at 96dpi
+  const pageW = 1047, pageH = 718;
+  const scale = Math.min(pageW / contentW, pageH / contentH, 1);
+  wrap.style.transform = `scale(${scale})`;
+  wrap.style.width = (contentW) + 'px';
+  window.print();
+  wrap.style.transform = '';
+  wrap.style.width = '';
+}
 
 function render() {
   if (!DATA) return;
