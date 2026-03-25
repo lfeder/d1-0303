@@ -25,36 +25,40 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 .legend-item { display: flex; align-items: center; gap: 4px; }
 .legend-swatch { width: 14px; height: 12px; border-radius: 2px; border: 1px solid #ccc; }
 
-/* Table */
-.vol-wrap { overflow: auto; max-height: calc(100vh - 160px); }
-table.vol { border-collapse: separate; border-spacing: 0; font-size: 10px; }
-table.vol th, table.vol td { padding: 2px 4px; white-space: nowrap; border-right: 1px solid #e0e0d8; border-bottom: 1px solid #e0e0d8; }
-table.vol thead th { position: sticky; top: 0; z-index: 10; background: #e8e8e2; font-weight: bold; font-size: 9px; color: #444; }
+/* Layout */
+.viewer { max-height: calc(100vh - 160px); overflow-y: auto; }
 
-/* Pinned columns */
-table.vol .pin-exch { position: sticky; left: 0; z-index: 5; min-width: 40px; }
-table.vol .pin-sym { position: sticky; left: 40px; z-index: 5; min-width: 56px; font-weight: bold; }
-table.vol .pin-avg { position: sticky; left: 96px; z-index: 5; min-width: 52px; text-align: right; }
-table.vol thead .pin-exch, table.vol thead .pin-sym, table.vol thead .pin-avg { z-index: 15; }
+/* Header row with date ticks */
+.date-header { display: flex; align-items: flex-end; padding: 0 0 2px 0; border-bottom: 2px solid #bbb; margin-bottom: 0; }
+.date-header .col-exch { width: 40px; min-width: 40px; }
+.date-header .col-sym { width: 56px; min-width: 56px; }
+.date-header .col-avg { width: 52px; min-width: 52px; }
+.date-header .col-bar { flex: 1; position: relative; height: 16px; }
+.date-tick { position: absolute; bottom: 0; font-size: 9px; color: #888; border-left: 1px solid #ccc; padding-left: 2px; white-space: nowrap; }
 
-/* Row types */
-tr.exch-summary td { background: #e0e0d8; font-weight: bold; font-size: 11px; }
-tr.exch-summary:hover td { background: #d4d4cc; }
-tr.section-hdr td { background: #d8dce4; font-weight: bold; font-size: 10px; padding: 4px; }
-tr.coin-row { background: #fafaf5; }
-tr.coin-row:nth-child(even of .coin-row) { background: #f0f0eb; }
-tr.coin-row:hover td { background: #eeeee8 !important; }
+/* Rows */
+.vol-row { display: flex; align-items: center; height: 16px; border-bottom: 1px solid #e8e8e2; }
+.vol-row:hover { background: #eeeee8; }
+.vol-row .col-exch { width: 40px; min-width: 40px; font-size: 10px; padding: 0 4px; color: #666; }
+.vol-row .col-sym { width: 56px; min-width: 56px; font-size: 10px; padding: 0 4px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; }
+.vol-row .col-avg { width: 52px; min-width: 52px; font-size: 9px; padding: 0 4px; text-align: right; color: #444; }
+.vol-row .col-bar { flex: 1; height: 14px; position: relative; cursor: crosshair; }
+.vol-row .col-bar canvas { width: 100%; height: 100%; display: block; }
 
-/* Volume cells */
-.vc { text-align: right; font-size: 9px; min-width: 42px; }
-.vc-zero { color: #ccc; }
+.vol-row.exch-summary { background: #e0e0d8; font-weight: bold; height: 18px; }
+.vol-row.exch-summary:hover { background: #d4d4cc; }
+.vol-row.exch-summary .col-sym { font-size: 11px; }
+.vol-row.section-hdr { background: #d8dce4; font-weight: bold; height: 18px; justify-content: center; font-size: 10px; }
+
+/* Tooltip */
+.bar-tip { display: none; position: fixed; background: #333; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 10px; white-space: nowrap; z-index: 100; pointer-events: none; font-family: monospace; }
 
 #loading { text-align: center; padding: 40px; color: #888; font-size: 13px; }
 </style>
 </head>
 <body>
 
-<div style="font-size:10px;font-family:monospace;color:#222;margin-bottom:4px">v: 03-24 07:40pm</div>
+<div style="font-size:10px;font-family:monospace;color:#222;margin-bottom:4px">v: 03-24 07:55pm</div>
 <h2>Daily Volume Viewer</h2>
 <p class="sub">Daily perpetual-swap volume (quote USD) by exchange &amp; coin &nbsp;|&nbsp; Mar 2025 – Mar 2026</p>
 
@@ -75,11 +79,6 @@ tr.coin-row:hover td { background: #eeeee8 !important; }
   <button class="exch-btn" data-ex="aster" onclick="setExch('aster')">AS</button>
   <button class="exch-btn" data-ex="lighter" onclick="setExch('lighter')">LT</button>
   <div class="sep"></div>
-  <span class="label">Range:</span>
-  <button class="range-btn active" data-range="30" onclick="setRange(30)">30d</button>
-  <button class="range-btn" data-range="90" onclick="setRange(90)">90d</button>
-  <button class="range-btn" data-range="0" onclick="setRange(0)">All</button>
-  <div class="sep"></div>
   <button id="btn-multi" class="active" onclick="toggleMulti()">2+ exch only</button>
   <div class="sep"></div>
   <span id="status" style="font-size:10px;color:#666"></span>
@@ -93,20 +92,25 @@ tr.coin-row:hover td { background: #eeeee8 !important; }
 </div>
 
 <div id="loading">Loading volume.json…</div>
-<div class="vol-wrap" id="volWrap" style="display:none">
-  <table class="vol" id="volTable"></table>
+<div id="viewer" class="viewer" style="display:none">
+  <div class="date-header" id="dateHeader">
+    <div class="col-exch">Ex</div>
+    <div class="col-sym">Coin</div>
+    <div class="col-avg">Avg</div>
+    <div class="col-bar" id="dateTickBar"></div>
+  </div>
+  <div id="rows"></div>
 </div>
+<div class="bar-tip" id="tip"></div>
 
 <script>
 let DATA = null;
-let rankFilter = '1';   // '1'-'6' or null when in exchange mode
-let exchFilter = null;   // exchange name or null when in rank mode
+let rankFilter = '1';
+let exchFilter = null;
 let multiExchOnly = true;
-let dateRange = 30;      // 30, 90, or 0 (all)
 
 const EXCH_ABBR = { binance: 'BN', bybit: 'BB', okx: 'OKX', hyperliquid: 'HL', aster: 'AS', lighter: 'LT' };
 
-// ── Formatting ──
 function fmtVol(v) {
   if (!v) return '';
   if (v >= 1e9) return (v / 1e9).toFixed(1) + 'B';
@@ -114,71 +118,79 @@ function fmtVol(v) {
   if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
   return String(Math.round(v));
 }
-
 function fmtFull(v) {
   if (!v) return '$0';
   return '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
-// ── Color (log green) ──
-function volBg(v, maxLog) {
-  if (!v) return '';
-  const ratio = Math.log10(v + 1) / maxLog;
-  const c = Math.max(0, Math.min(1, ratio));
-  return `rgb(${Math.round(245 - c * 219)},${Math.round(245 - c * 123)},${Math.round(240 - c * 214)})`;
+// Green color scale: returns [r,g,b]
+function volRgb(v, maxLog) {
+  if (!v) return null;
+  const c = Math.max(0, Math.min(1, Math.log10(v + 1) / maxLog));
+  return [Math.round(245 - c * 219), Math.round(245 - c * 123), Math.round(240 - c * 214)];
 }
 
-// ── Toolbar actions ──
 function setRank(r) {
   rankFilter = r; exchFilter = null;
   document.querySelectorAll('.rank-btn').forEach(b => b.classList.toggle('active', b.dataset.rank === r));
   document.querySelectorAll('.exch-btn').forEach(b => b.classList.remove('active-exch'));
   render();
 }
-
 function setExch(ex) {
   exchFilter = ex; rankFilter = null;
   document.querySelectorAll('.exch-btn').forEach(b => b.classList.toggle('active-exch', b.dataset.ex === ex));
   document.querySelectorAll('.rank-btn').forEach(b => b.classList.remove('active'));
   render();
 }
-
-function setRange(days) {
-  dateRange = days;
-  document.querySelectorAll('.range-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.range) === days));
-  render();
-}
-
 function toggleMulti() {
   multiExchOnly = !multiExchOnly;
   document.getElementById('btn-multi').classList.toggle('active', multiExchOnly);
   render();
 }
 
-// ── Compute visible date slice ──
-function getDateSlice() {
-  const allDates = DATA.dates;
-  if (!dateRange) return { start: 0, end: allDates.length };
-  const end = allDates.length;
-  const start = Math.max(0, end - dateRange);
-  return { start, end };
-}
-
-// ── Average volume for a coin on an exchange over visible period ──
-function avgVol(vols, start, end) {
+function avgVol(vols) {
   let sum = 0, count = 0;
-  for (let i = start; i < end; i++) {
-    if (vols[i]) { sum += vols[i]; count++; }
-  }
+  for (const v of vols) { if (v) { sum += v; count++; } }
   return count ? sum / count : 0;
 }
 
-// ── Render ──
+// Paint a canvas bar for a volume array
+function paintBar(canvas, vols, maxLog) {
+  const n = vols.length;
+  canvas.width = n;
+  canvas.height = 1;
+  const ctx = canvas.getContext('2d');
+  const img = ctx.createImageData(n, 1);
+  for (let i = 0; i < n; i++) {
+    const rgb = volRgb(vols[i], maxLog);
+    const off = i * 4;
+    if (rgb) {
+      img.data[off] = rgb[0]; img.data[off+1] = rgb[1]; img.data[off+2] = rgb[2]; img.data[off+3] = 255;
+    } else {
+      img.data[off] = 238; img.data[off+1] = 238; img.data[off+2] = 232; img.data[off+3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+// Tooltip on bar hover
+const tip = document.getElementById('tip');
+function barMove(e, dates, vols) {
+  const rect = e.target.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const idx = Math.floor(x / rect.width * dates.length);
+  if (idx < 0 || idx >= dates.length) { tip.style.display = 'none'; return; }
+  tip.textContent = `${dates[idx]}: ${fmtFull(vols[idx])}`;
+  tip.style.display = 'block';
+  tip.style.left = (e.clientX + 12) + 'px';
+  tip.style.top = (e.clientY - 24) + 'px';
+}
+function barLeave() { tip.style.display = 'none'; }
+
 function render() {
   if (!DATA) return;
   const { dates, exchanges, exchDaily, coins } = DATA;
-  const { start, end } = getDateSlice();
-  const nDates = end - start;
+  const n = dates.length;
 
   // Filter coins
   let filtered = coins;
@@ -189,15 +201,13 @@ function render() {
   for (const coin of filtered) {
     let ex, vols;
     if (exchFilter) {
-      // Direct exchange mode: skip coins not on this exchange
       if (!coin.e[exchFilter]) continue;
       ex = exchFilter;
       vols = coin.e[exchFilter];
     } else {
-      // Rank mode: rank exchanges by avg vol in visible period, pick Nth
       const ranked = [];
       for (const e of Object.keys(coin.e)) {
-        ranked.push({ e, avg: avgVol(coin.e[e], start, end) });
+        ranked.push({ e, avg: avgVol(coin.e[e]) });
       }
       ranked.sort((a, b) => b.avg - a.avg);
       const idx = parseInt(rankFilter) - 1;
@@ -205,83 +215,77 @@ function render() {
       ex = ranked[idx].e;
       vols = coin.e[ex];
     }
-    const avg = avgVol(vols, start, end);
-    rows.push({ symbol: coin.s, ex, vols, avg });
+    rows.push({ symbol: coin.s, ex, vols, avg: avgVol(vols) });
   }
-
-  // Sort by avg volume descending
   rows.sort((a, b) => b.avg - a.avg);
 
-  // Status
   const mode = exchFilter ? (EXCH_ABBR[exchFilter] || exchFilter) : `rank #${rankFilter}`;
-  document.getElementById('status').textContent = `${rows.length} coins · ${mode} · ${nDates}d`;
+  document.getElementById('status').textContent = `${rows.length} coins · ${mode}`;
 
-  // Color scales
-  const exchVals = exchanges.flatMap(ex => exchDaily[ex].slice(start, end)).filter(v => v > 0);
-  const maxLogExch = Math.log10(Math.max(...exchVals, 1) + 1);
-  const coinVals = rows.flatMap(r => r.vols.slice(start, end)).filter(v => v > 0);
-  const maxLogCoin = Math.log10(Math.max(...coinVals, 1) + 1);
+  // Max log for exchange and coin scales
+  const exchMax = Math.max(...exchanges.flatMap(ex => exchDaily[ex]).filter(v => v > 0), 1);
+  const maxLogExch = Math.log10(exchMax + 1);
+  const coinMax = Math.max(...rows.flatMap(r => r.vols).filter(v => v > 0), 1);
+  const maxLogCoin = Math.log10(coinMax + 1);
 
-  // Date ticks (every ~14 days)
-  const tickStep = Math.max(1, Math.floor(nDates / 26));
-  const tickSet = new Set();
-  for (let i = 0; i < nDates; i += tickStep) tickSet.add(i);
-
-  // Build table HTML
-  let h = '<thead><tr>';
-  h += '<th class="pin-exch">Ex</th><th class="pin-sym">Coin</th><th class="pin-avg">Avg</th>';
-  for (let i = 0; i < nDates; i++) {
-    h += `<th>${tickSet.has(i) ? dates[start + i].slice(5) : ''}</th>`;
+  // Date ticks
+  const tickBar = document.getElementById('dateTickBar');
+  tickBar.innerHTML = '';
+  const step = Math.max(1, Math.floor(n / 26));
+  for (let i = 0; i < n; i += step) {
+    const pct = (i / n * 100).toFixed(2);
+    const tick = document.createElement('div');
+    tick.className = 'date-tick';
+    tick.style.left = pct + '%';
+    tick.textContent = dates[i].slice(5);
+    tickBar.appendChild(tick);
   }
-  h += '</tr></thead><tbody>';
 
-  // Exchange summary
+  // Build rows
+  const container = document.getElementById('rows');
+  container.innerHTML = '';
+
+  // Exchange summary rows
   for (const ex of exchanges) {
     const vols = exchDaily[ex];
-    let total = 0;
-    for (let i = start; i < end; i++) total += vols[i];
-    const a = total / nDates;
-    h += `<tr class="exch-summary"><td class="pin-exch" style="background:#e0e0d8">${EXCH_ABBR[ex] || ex}</td>`;
-    h += `<td class="pin-sym" style="background:#e0e0d8"></td>`;
-    h += `<td class="pin-avg" style="background:#e0e0d8" title="${fmtFull(a)}/day">${fmtVol(a)}</td>`;
-    for (let i = start; i < end; i++) {
-      const v = vols[i];
-      const bg = volBg(v, maxLogExch);
-      h += `<td class="vc${v ? '' : ' vc-zero'}" style="${bg ? 'background:' + bg : ''}" title="${dates[i]}: ${fmtFull(v)}">${fmtVol(v)}</td>`;
-    }
-    h += '</tr>';
+    const avg = avgVol(vols);
+    const row = document.createElement('div');
+    row.className = 'vol-row exch-summary';
+    row.innerHTML = `<div class="col-exch">${EXCH_ABBR[ex] || ex}</div><div class="col-sym"></div><div class="col-avg" title="${fmtFull(avg)}/day">${fmtVol(avg)}</div><div class="col-bar"><canvas style="image-rendering:pixelated"></canvas></div>`;
+    container.appendChild(row);
+    const canvas = row.querySelector('canvas');
+    paintBar(canvas, vols, maxLogExch);
+    const barDiv = row.querySelector('.col-bar');
+    barDiv.addEventListener('mousemove', e => barMove(e, dates, vols));
+    barDiv.addEventListener('mouseleave', barLeave);
   }
 
-  // Separator
-  h += `<tr class="section-hdr"><td class="pin-exch" style="background:#d8dce4"></td><td class="pin-sym" style="background:#d8dce4">Coins</td><td class="pin-avg" style="background:#d8dce4"></td>`;
-  for (let i = 0; i < nDates; i++) h += '<td style="background:#d8dce4"></td>';
-  h += '</tr>';
+  // Section separator
+  const sep = document.createElement('div');
+  sep.className = 'vol-row section-hdr';
+  sep.innerHTML = `<div style="padding:0 4px">Coins</div>`;
+  container.appendChild(sep);
 
   // Coin rows
-  for (const row of rows) {
-    h += '<tr class="coin-row">';
-    h += `<td class="pin-exch" style="background:inherit">${EXCH_ABBR[row.ex] || row.ex}</td>`;
-    h += `<td class="pin-sym" style="background:inherit">${row.symbol}</td>`;
-    h += `<td class="pin-avg" style="background:inherit" title="${fmtFull(row.avg)}/day">${fmtVol(row.avg)}</td>`;
-    for (let i = start; i < end; i++) {
-      const v = row.vols[i];
-      const bg = volBg(v, maxLogCoin);
-      h += `<td class="vc${v ? '' : ' vc-zero'}" style="${bg ? 'background:' + bg : ''}" title="${dates[i]}: ${fmtFull(v)}">${fmtVol(v)}</td>`;
-    }
-    h += '</tr>';
+  for (const r of rows) {
+    const row = document.createElement('div');
+    row.className = 'vol-row';
+    row.innerHTML = `<div class="col-exch">${EXCH_ABBR[r.ex] || r.ex}</div><div class="col-sym" title="${r.symbol}">${r.symbol}</div><div class="col-avg" title="${fmtFull(r.avg)}/day">${fmtVol(r.avg)}</div><div class="col-bar"><canvas style="image-rendering:pixelated"></canvas></div>`;
+    container.appendChild(row);
+    const canvas = row.querySelector('canvas');
+    paintBar(canvas, r.vols, maxLogCoin);
+    const barDiv = row.querySelector('.col-bar');
+    barDiv.addEventListener('mousemove', e => barMove(e, dates, r.vols));
+    barDiv.addEventListener('mouseleave', barLeave);
   }
-
-  h += '</tbody>';
-  document.getElementById('volTable').innerHTML = h;
 }
 
-// ── Load ──
 fetch('volume.json')
   .then(r => r.json())
   .then(d => {
     DATA = d;
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('volWrap').style.display = 'block';
+    document.getElementById('viewer').style.display = 'block';
     render();
   })
   .catch(e => {
