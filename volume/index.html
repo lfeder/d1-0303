@@ -57,22 +57,13 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 
 #loading { text-align: center; padding: 40px; color: #888; font-size: 13px; }
 
-@media print {
-  @page { size: portrait; margin: 3mm; }
-  body { padding: 0; }
-  .toolbar, .legend, .bar-tip, #loading { display: none !important; }
-  p.sub { display: none !important; }
-  .viewer { max-height: none !important; overflow: visible !important; }
-  .vol-row .col-bar canvas { image-rendering: pixelated; }
-  #printWrap { transform-origin: top left; }
-}
 </style>
 </head>
 <body>
 
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
 <h2 style="font-size:14px">Daily Volume Viewer</h2>
-<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:41</div>
+<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:46</div>
 </div>
 <p class="sub">Daily perpetual-swap volume (quote USD) by exchange &amp; coin &nbsp;|&nbsp; Mar 2025 – Mar 2026</p>
 
@@ -99,7 +90,7 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
   <div class="sep"></div>
   <span id="status" style="font-size:10px;color:#666"></span>
   <div class="sep"></div>
-  <button onclick="printPage()" style="border-color:#888">Print</button>
+  <button onclick="savePng()" style="border-color:#888">Save PNG</button>
 </div>
 
 <div class="legend">
@@ -111,7 +102,6 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 </div>
 
 <div id="loading">Loading volume.json…</div>
-<div id="printWrap">
 <div id="viewer" class="viewer" style="display:none">
   <div class="date-header" id="dateHeader">
     <div class="col-num">#</div>
@@ -122,7 +112,6 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
   </div>
   <div id="rows"></div>
 </div>
-</div><!-- printWrap -->
 <div class="bar-tip" id="tip"></div>
 
 <script>
@@ -218,18 +207,97 @@ function barMove(e, visibleDates, vols, start) {
 }
 function barLeave() { tip.style.display = 'none'; }
 
-function printPage() {
-  const wrap = document.getElementById('printWrap');
-  const contentH = wrap.scrollHeight;
-  const contentW = wrap.scrollWidth;
-  // Portrait A4 printable area ~200mm x 287mm ≈ 756px x 1085px at 96dpi
-  const pageW = 756, pageH = 1085;
-  const scale = Math.min(pageW / contentW, pageH / contentH, 1);
-  wrap.style.transform = `scale(${scale})`;
-  wrap.style.width = (contentW) + 'px';
-  window.print();
-  wrap.style.transform = '';
-  wrap.style.width = '';
+function savePng() {
+  if (!DATA || !DATA._lastRender) return;
+  const { summaryRows: sRows, coinRows: cRows, start, end, mode } = DATA._lastRender;
+  const dates = DATA.dates;
+  const nVis = end - start;
+
+  const ROW_H = 10, HDR_H = 16, SEP_H = 12;
+  const COL_NUM = 28, COL_EX = 32, COL_SYM = 58, COL_AVG = 50;
+  const LEFT = COL_NUM + COL_EX + COL_SYM + COL_AVG;
+  const BAR_W = Math.max(nVis * 2, 400);
+  const W = LEFT + BAR_W + 4;
+  const TITLE_H = 20;
+  const totalRows = sRows.length + 1 + cRows.length;
+  const H = TITLE_H + HDR_H + totalRows * ROW_H + SEP_H + 4;
+
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#f5f5f0'; ctx.fillRect(0, 0, W, H);
+  ctx.font = '10px monospace';
+
+  // Title
+  ctx.fillStyle = '#222'; ctx.font = 'bold 12px monospace';
+  ctx.fillText(`Daily Volume · ${mode}`, 4, 13);
+  ctx.font = '10px monospace';
+  let y = TITLE_H;
+
+  // Date header
+  ctx.fillStyle = '#e8e8e2'; ctx.fillRect(0, y, W, HDR_H);
+  ctx.fillStyle = '#444'; ctx.font = 'bold 9px monospace';
+  ctx.fillText('#', 4, y + 11);
+  ctx.fillText('Ex', COL_NUM + 2, y + 11);
+  ctx.fillText('Coin', COL_NUM + COL_EX + 2, y + 11);
+  ctx.fillText('Avg', COL_NUM + COL_EX + COL_SYM + 2, y + 11);
+  const tickStep = Math.max(1, Math.floor(nVis / 20));
+  for (let i = 0; i < nVis; i += tickStep) {
+    const x = LEFT + (i / nVis) * BAR_W;
+    ctx.fillStyle = '#ccc'; ctx.fillRect(x, y, 1, HDR_H);
+    ctx.fillStyle = '#888';
+    ctx.fillText(dates[start + i].slice(5), x + 2, y + 11);
+  }
+  y += HDR_H;
+  ctx.font = '9px monospace';
+
+  function drawBar(yPos, vols, colorFn) {
+    const pw = BAR_W / nVis;
+    for (let i = 0; i < nVis; i++) {
+      const rgb = colorFn(vols[start + i]);
+      ctx.fillStyle = rgb ? `rgb(${rgb[0]},${rgb[1]},${rgb[2]})` : '#eeeee8';
+      ctx.fillRect(LEFT + i * pw, yPos, Math.ceil(pw), ROW_H - 1);
+    }
+  }
+
+  // Summary rows
+  for (const sr of sRows) {
+    ctx.fillStyle = '#e0e0d8'; ctx.fillRect(0, y, LEFT, ROW_H);
+    ctx.fillStyle = '#222'; ctx.font = 'bold 9px monospace';
+    ctx.fillText(sr.label, COL_NUM + 2, y + 8);
+    ctx.fillText(fmtVol(sr.avg), COL_NUM + COL_EX + COL_SYM + 2, y + 8);
+    ctx.font = '9px monospace';
+    drawBar(y, sr.vols, sumRgb);
+    y += ROW_H;
+  }
+
+  // Separator
+  ctx.fillStyle = '#d8dce4'; ctx.fillRect(0, y, W, SEP_H);
+  ctx.fillStyle = '#222'; ctx.font = 'bold 9px monospace';
+  ctx.fillText('Coins', COL_NUM + COL_EX + 2, y + 9);
+  ctx.font = '9px monospace';
+  y += SEP_H;
+
+  // Coin rows
+  for (let i = 0; i < cRows.length; i++) {
+    const r = cRows[i];
+    const bg = i % 2 ? '#f0f0eb' : '#fafaf5';
+    ctx.fillStyle = bg; ctx.fillRect(0, y, LEFT, ROW_H);
+    ctx.fillStyle = '#999'; ctx.fillText(String(i + 1), 4, y + 8);
+    ctx.fillStyle = '#666'; ctx.fillText(EXCH_ABBR[r.ex] || r.ex, COL_NUM + 2, y + 8);
+    ctx.fillStyle = '#222'; ctx.font = 'bold 9px monospace';
+    ctx.fillText(r.symbol, COL_NUM + COL_EX + 2, y + 8);
+    ctx.font = '9px monospace';
+    ctx.fillStyle = '#444'; ctx.fillText(fmtVol(r.avg), COL_NUM + COL_EX + COL_SYM + 2, y + 8);
+    drawBar(y, r.vols, volRgb);
+    y += ROW_H;
+  }
+
+  // Download
+  const a = document.createElement('a');
+  a.download = `volume-${mode.replace(/[^a-zA-Z0-9]/g, '')}-${dates[start]}_${dates[end-1]}.png`;
+  a.href = c.toDataURL('image/png');
+  a.click();
 }
 
 function render() {
@@ -304,6 +372,10 @@ function render() {
 
   const mode = exchFilter ? (EXCH_ABBR[exchFilter] || exchFilter) : `rank #${rankFilter}`;
   document.getElementById('status').textContent = `${rows.length} coins · ${mode} · ${nVis}d`;
+
+  // Store for PNG export
+  const srWithAvg = summaryRows.map(sr => ({ ...sr, avg: avgSlice(sr.vols, start, end) }));
+  DATA._lastRender = { summaryRows: srWithAvg, coinRows: rows, start, end, mode };
 
   // Date ticks
   const tickBar = document.getElementById('dateTickBar');
