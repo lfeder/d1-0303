@@ -60,7 +60,7 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 
 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
 <h2 style="font-size:14px">Daily Volume Viewer</h2>
-<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 19:56</div>
+<div style="font-size:10px;font-family:monospace;color:#222">v: 03-24 20:02</div>
 </div>
 <p class="sub">Daily perpetual-swap volume (quote USD) by exchange &amp; coin &nbsp;|&nbsp; Mar 2025 – Mar 2026</p>
 
@@ -85,10 +85,11 @@ p.sub { color: #666; font-size: 10px; margin-bottom: 10px; }
 </div>
 
 <div class="legend">
-  <div class="legend-item"><div class="legend-swatch" style="background:#f5f5f0"></div> No data</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#e8f0e4"></div> Low</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#7bc47b"></div> Mid</div>
-  <div class="legend-item"><div class="legend-swatch" style="background:#1a7a1a"></div> High</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#eeeee8"></div> No data</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:rgb(200,100,100)"></div> &lt;$1M</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:rgb(220,200,80)"></div> $1–10M</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:rgb(124,196,124)"></div> $10–100M</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:rgb(26,122,26)"></div> &gt;$100M</div>
 </div>
 
 <div id="loading">Loading volume.json…</div>
@@ -122,11 +123,13 @@ function fmtFull(v) {
   return '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
-// Green color scale: returns [r,g,b]
-function volRgb(v, maxLog) {
+// Fixed threshold color: returns [r,g,b]
+function volRgb(v) {
   if (!v) return null;
-  const c = Math.max(0, Math.min(1, Math.log10(v + 1) / maxLog));
-  return [Math.round(245 - c * 219), Math.round(245 - c * 123), Math.round(240 - c * 214)];
+  if (v >= 1e8) return [26, 122, 26];    // >$100M dark green
+  if (v >= 1e7) return [124, 196, 124];   // $10-100M light green
+  if (v >= 1e6) return [220, 200, 80];    // $1-10M yellow
+  return [200, 100, 100];                  // <$1M red
 }
 
 function setRank(r) {
@@ -148,14 +151,14 @@ function avgVol(vols) {
 }
 
 // Paint a canvas bar for a volume array
-function paintBar(canvas, vols, maxLog) {
+function paintBar(canvas, vols) {
   const n = vols.length;
   canvas.width = n;
   canvas.height = 1;
   const ctx = canvas.getContext('2d');
   const img = ctx.createImageData(n, 1);
   for (let i = 0; i < n; i++) {
-    const rgb = volRgb(vols[i], maxLog);
+    const rgb = volRgb(vols[i]);
     const off = i * 4;
     if (rgb) {
       img.data[off] = rgb[0]; img.data[off+1] = rgb[1]; img.data[off+2] = rgb[2]; img.data[off+3] = 255;
@@ -213,14 +216,6 @@ function render() {
   const mode = exchFilter ? (EXCH_ABBR[exchFilter] || exchFilter) : `rank #${rankFilter}`;
   document.getElementById('status').textContent = `${rows.length} coins · ${mode}`;
 
-  // Max log for exchange and coin scales
-  let exchMax = 1;
-  for (const ex of exchanges) for (const v of exchDaily[ex]) if (v > exchMax) exchMax = v;
-  const maxLogExch = Math.log10(exchMax + 1);
-  let coinMax = 1;
-  for (const r of rows) for (const v of r.vols) if (v > coinMax) coinMax = v;
-  const maxLogCoin = Math.log10(coinMax + 1);
-
   // Date ticks
   const tickBar = document.getElementById('dateTickBar');
   tickBar.innerHTML = '';
@@ -247,7 +242,7 @@ function render() {
     row.innerHTML = `<div class="col-exch">${EXCH_ABBR[ex] || ex}</div><div class="col-sym"></div><div class="col-avg" title="${fmtFull(avg)}/day">${fmtVol(avg)}</div><div class="col-bar"><canvas style="image-rendering:pixelated"></canvas></div>`;
     container.appendChild(row);
     const canvas = row.querySelector('canvas');
-    paintBar(canvas, vols, maxLogExch);
+    paintBar(canvas, vols);
     const barDiv = row.querySelector('.col-bar');
     barDiv.addEventListener('mousemove', e => barMove(e, dates, vols));
     barDiv.addEventListener('mouseleave', barLeave);
@@ -266,7 +261,7 @@ function render() {
     row.innerHTML = `<div class="col-exch">${EXCH_ABBR[r.ex] || r.ex}</div><div class="col-sym" title="${r.symbol}">${r.symbol}</div><div class="col-avg" title="${fmtFull(r.avg)}/day">${fmtVol(r.avg)}</div><div class="col-bar"><canvas style="image-rendering:pixelated"></canvas></div>`;
     container.appendChild(row);
     const canvas = row.querySelector('canvas');
-    paintBar(canvas, r.vols, maxLogCoin);
+    paintBar(canvas, r.vols);
     const barDiv = row.querySelector('.col-bar');
     barDiv.addEventListener('mousemove', e => barMove(e, dates, r.vols));
     barDiv.addEventListener('mouseleave', barLeave);
